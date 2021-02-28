@@ -1,145 +1,152 @@
 <template>
-    <div class="event-organization pa-4">
-        <v-card elevation="2">
-            <v-card-text>
-                <h4 class="text-h4 mb-4">Organization of Events</h4>
+  <FormTemplate
+      id="event-organization"
+      name="Organization of Events"
+      :form="submittableForm"
+  >
+    <template #form>
+      <MembersInput :members.sync="form.members" label="Members"/>
 
+      <v-radio-group
+          v-model="form.regionType"
 
-                <v-form
-                        v-model="valid">
+          :rules="[
+                                        v => !!v || 'Region type is required',
+                                    ]"
 
-                    <MembersInput :members.sync="form.members" label="Members"/>
+          row
+      >
+        <v-radio
+            label="National"
+            value="national"
+        ></v-radio>
+        <v-radio
+            label="International"
+            value="international"
+        ></v-radio>
+      </v-radio-group>
 
-                    <v-radio-group
-                            v-model="form.regionType"
-                            row
-                    >
-                        <v-radio
-                                label="National"
-                                value="national"
-                        ></v-radio>
-                        <v-radio
-                                label="International"
-                                value="international"
-                        ></v-radio>
-                    </v-radio-group>
+      <v-select
+          :items="['Workshop', 'Scientific Meeting']"
+          v-model="form.eventType"
 
-                    <v-select
-                            :items="['Workshop', 'Scientific Meeting']"
-                            v-model="form.type"
-
-                            :rules="[
+          :rules="[
                                         v => !!v || 'Event type is required',
                                     ]"
-                            required
+          required
 
-                            label="Type of Event"
-                    ></v-select>
+          label="Type of Event"
+      ></v-select>
 
-                    <v-select
-                            :items="['Organizer', 'Local Organizer', 'Other']"
-                            v-model="form.involvement"
+      <v-select
+          :items="['Organizer', 'Local Organizer', 'Other']"
+          v-model="form.involvementType"
 
-                            :rules="[
+          :rules="[
                                         v => !!v || 'Involvement type is required',
                                     ]"
-                            required
+          required
 
-                            label="Type of Involvement"
-                    ></v-select>
+          label="Type of Involvement"
+      ></v-select>
 
-                    <v-text-field
-                            v-model="form.designation"
-                            :rules="[
+      <v-text-field
+          v-model="form.designation"
+          :rules="[
                                         v => !!v || 'Designation is required',
                                     ]"
-                            required
+          required
 
-                            label="Designation"
-                    ></v-text-field>
+          label="Designation"
+      ></v-text-field>
 
-                    <v-text-field
-                            v-model="form.local"
-                            :rules="[
+      <v-text-field
+          v-model="form.local"
+          :rules="[
                                         v => !!v || 'Local is required',
                                     ]"
-                            required
+          required
 
-                            label="Local"
-                    ></v-text-field>
+          label="Local"
+      ></v-text-field>
 
-                    <v-menu
-                            :close-on-content-click="false"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="auto"
-                    >
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                                    :value="formatDate"
-                                    label="Date"
-                                    readonly
-                                    v-bind="attrs"
-                                    v-on="on"
-                            ></v-text-field>
-                        </template>
-                        <v-date-picker
-                                v-model="form.date"
-                                range
-                        ></v-date-picker>
-                    </v-menu>
+      <v-menu
+          :close-on-content-click="false"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
+              :value="formatDate"
+              label="Date"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+          ></v-text-field>
+        </template>
+        <v-date-picker
+            v-model="form.date"
+            range
+        ></v-date-picker>
+      </v-menu>
 
-                    <v-text-field
-                            v-model="form.url"
-                            :rules="[
+      <v-text-field
+          v-model="form.url"
+          :rules="[
                                         v => !!v || 'URL is required',
                                     ]"
-                            required
+          required
 
-                            label="URL"
-                    ></v-text-field>
+          label="URL"
+      ></v-text-field>
 
-                    <v-textarea
-                            v-model="form.observations"
-                            solo
+      <v-textarea
+          v-model="form.observations"
+          solo
 
-                            name="input-7-4"
-                            label="Observations"
-                    ></v-textarea>
-                </v-form>
-            </v-card-text>
-        </v-card>
-    </div>
+          name="input-7-4"
+          label="Observations"
+      ></v-textarea>
+    </template>
+  </FormTemplate>
 </template>
 
 <script>
-    import MembersInput from "@/components/MembersInput";
+import MembersInput from "@/components/MembersInput";
+import FormTemplate from "@/components/FormTemplate";
 
-    export default {
-        name: 'EventOrganization',
-        components: {
-            MembersInput,
-        },
-        data() {
-            return {
-                valid: false,
-                form: {
-                    members: [],
-                    type: '',
-                    involvement: '',
-                    regionType: '',
-                    designation: '',
-                    local: '',
-                    date: [new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10)],
-                    url: '',
-                    observations: '',
-                }
-            }
-        },
-        computed: {
-            formatDate() {
-                return this.form.date.join(' ~ ')
-            }
-        }
+export default {
+  name: 'EventOrganization',
+  components: {
+    MembersInput,
+    FormTemplate
+  },
+  data() {
+    return {
+      form: {
+        members: [],
+        eventType: '',
+        involvementType: '',
+        regionType: '',
+        designation: '',
+        local: '',
+        date: [new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10)],
+        url: '',
+        observations: '',
+      }
     }
+  },
+  computed: {
+    formatDate() {
+      return this.form.date.join(' ~ ')
+    },
+    submittableForm() {
+      const copy = Object.assign({}, this.form);
+      copy.members = copy.members.map(m => m.id)
+
+      return copy
+    }
+  }
+}
 </script>

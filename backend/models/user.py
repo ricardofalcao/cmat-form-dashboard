@@ -1,12 +1,17 @@
 from typing import Optional, List
 
 from fastapi_users import models
-from fastapi_users.db import TortoiseBaseUserModel
-from tortoise import fields
+from fastapi_users.db import SQLAlchemyBaseUserTable
+from sqlalchemy import Column, String
+
+from database import Base
 
 
 class User(models.BaseUser):
     name: Optional[str] = None
+
+    class Config:
+        orm_mode = True
 
 class UserList(models.BaseModel):
     users: List[User] = []
@@ -21,5 +26,5 @@ class UserUpdate(User, models.BaseUserUpdate):
 class UserDB(User, models.BaseUserDB):
     pass
 
-class TortoiseUserModel(TortoiseBaseUserModel):
-    name = fields.CharField(index=True, null=False, max_length=64)
+class AlchemyUserModel(Base, SQLAlchemyBaseUserTable):
+    name = Column(String(length=64), index=True, nullable=False)

@@ -1,5 +1,18 @@
-from fastapi_users.db import TortoiseUserDatabase
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-from models.user import UserDB, TortoiseUserModel
+DATABASE_URL = "sqlite:///../test.db"
 
-user_db = TortoiseUserDatabase(UserDB, TortoiseUserModel)
+engine = sqlalchemy.create_engine(
+    DATABASE_URL, connect_args={"check_same_thread": False}
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+def get_database():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

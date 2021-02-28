@@ -1,14 +1,12 @@
-from fastapi import FastAPI, Depends, Query, HTTPException, APIRouter
+import databases
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import JWTAuthentication
-from fastapi_users.router import ErrorCode
-from fastapi_users.user import UserAlreadyExists
-from starlette import status
-from tortoise.contrib.fastapi import register_tortoise
+from fastapi_users.db import SQLAlchemyUserDatabase
 
-from database import user_db
-from models.user import User, UserCreate, UserUpdate, UserDB, UserList, TortoiseUserModel
+import database
+from models.user import User, UserCreate, UserUpdate, UserDB, AlchemyUserModel
 from routes.auth import register_auth_routes
 from routes.form import register_form_routes
 from routes.user import register_user_routes
@@ -25,37 +23,21 @@ auth_backends = []
 jwt_authentication = JWTAuthentication(secret=JWT_SECRET, lifetime_seconds=12 * 60 * 60)
 auth_backends.append(jwt_authentication)
 
+#
+#
+#
+
+
+database.Base.metadata.create_all(bind=database.engine)
+
+raw_database = databases.Database(database.DATABASE_URL)
 fastapi_users = FastAPIUsers(
-    user_db,
+    SQLAlchemyUserDatabase(UserDB, raw_database, AlchemyUserModel.__table__),
     auth_backends,
     User,
     UserCreate,
     UserUpdate,
     UserDB,
-)
-
-#
-#
-#
-
-DATABASE_URL = "sqlite://../test.db"
-
-TORTOISE_ORM = {
-    "connections": {"default": DATABASE_URL},
-    "apps": {
-        "models": {
-            "models": ["models.user", "aerich.models"],
-            "default_connection": "default",
-        },
-    },
-}
-
-register_tortoise(
-    app,
-    db_url=DATABASE_URL,
-    modules={"models": ["models.user", "models.forms"]},
-    generate_schemas=True,
-    add_exception_handlers=True,
 )
 
 #
@@ -88,3 +70,12 @@ app.include_router(
     prefix="/api",
     tags=["api"]
 )
+
+@app.on_event("startup")
+async def startup():
+    await raw_database.connect()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await raw_database.disconnect()

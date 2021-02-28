@@ -1,11 +1,12 @@
-from fastapi import FastAPI, APIRouter, Query, Depends, HTTPException
+from fastapi import APIRouter, Query, Depends, HTTPException
 from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import JWTAuthentication
 from fastapi_users.router import ErrorCode
 from fastapi_users.user import UserAlreadyExists
+from sqlalchemy.orm import Session
 from starlette import status
 
-from models.user import UserList, User, TortoiseUserModel, UserDB, UserCreate
+from database import get_database
+from models.user import UserList, User, UserDB, UserCreate, AlchemyUserModel
 
 
 def register_user_routes(router: APIRouter, fastapi_users: FastAPIUsers):
@@ -15,34 +16,21 @@ def register_user_routes(router: APIRouter, fastapi_users: FastAPIUsers):
     async def users_list(
             q: str = Query(..., min_length=3, max_length=64),
             user: User = Depends(fastapi_users.current_user()),
+            db: Session = Depends(get_database)
     ):
-        query = TortoiseUserModel.filter(name__contains=q).all()
-        users = await query
-
-        output = []
-        for user in users:
-            user_dict = await user.to_dict()
-
-            output.append(UserDB(**user_dict))
+        query = db.query(AlchemyUserModel).filter(AlchemyUserModel.name.contains(q)).all()
 
         return {
-            "users": output
+            "users": query
         }
 
     @users_router.get("/list", response_model=UserList)
     async def users_list(
             user: User = Depends(fastapi_users.current_user(superuser=True)),
+            db: Session = Depends(get_database)
     ):
-        query = TortoiseUserModel.all()
-        users = await query
-
-        output = []
-        for user in users:
-            user_dict = await user.to_dict()
-
-            output.append(UserDB(**user_dict))
-
-        return UserList(users = output)
+        query = db.query(AlchemyUserModel).all()
+        return UserList(users=query)
 
     @users_router.post("/create", response_model=User, status_code=status.HTTP_201_CREATED)
     async def register(
