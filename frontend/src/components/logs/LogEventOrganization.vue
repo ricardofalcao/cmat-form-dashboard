@@ -1,12 +1,17 @@
 <template>
   <LogTemplate
-      id="event-participation"
+      id="event-organization"
+      v-bind="$attrs"
       :headers="headers"
       :default-item="defaultItem"
   >
 
-    <template v-slot:table.title="{ item }">
-      {{ item.title ? item.title : 'none' }}
+    <template v-slot:table.user="{ item }">
+      {{ item.user.name }}
+    </template>
+
+    <template v-slot:table.members="{ item }">
+      {{ getMembersNames(item.members) }}
     </template>
 
     <template v-slot:table.date="{ item }">
@@ -28,6 +33,12 @@
             <v-list-item-subtitle>{{ item.user.name }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title>Members</v-list-item-title>
+            <v-list-item-subtitle>{{ item.members.map(m => m.name).join(', ') }}</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
 
         <v-list-item>
           <v-list-item-content>
@@ -38,22 +49,15 @@
 
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-title>Type of Participation</v-list-item-title>
-            <v-list-item-subtitle>{{ item.participationType }}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item v-if="item.title">
-          <v-list-item-content>
-            <v-list-item-title>Title</v-list-item-title>
-            <v-list-item-subtitle>{{ item.title }}</v-list-item-subtitle>
+            <v-list-item-title>Type of Involvement</v-list-item-title>
+            <v-list-item-subtitle>{{ item.involvementType }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-title>Event</v-list-item-title>
-            <v-list-item-subtitle>{{ item.event }}</v-list-item-subtitle>
+            <v-list-item-title>Designation</v-list-item-title>
+            <v-list-item-subtitle>{{ item.designation }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 
@@ -74,6 +78,13 @@
           </v-list-item-content>
         </v-list-item>
 
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title>URL</v-list-item-title>
+            <v-list-item-subtitle>{{ item.url }}</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+
         <v-list-item v-if="item.observations" three-line>
           <v-list-item-content>
             <v-list-item-title>Observations</v-list-item-title>
@@ -87,37 +98,45 @@
 </template>
 
 <script>
-import LogTemplate from "@/components/LogTemplate";
+import LogTemplate from "@/components/logs/LogTemplate";
 
 export default {
-  name: 'LogEventParticipation',
+  name: 'LogEventOrganization',
   components: {
     LogTemplate
   },
   data() {
     return {
       headers: [
-        {text: 'User', value: 'user.name'},
+        {text: 'User', value: 'user'},
+        {text: 'Members', value: 'members'},
         {text: 'Type of Event', value: 'eventType'},
-        {text: 'Type of Participation', value: 'participationType'},
-        {text: 'Title', value: 'title'},
-        {text: 'Event', value: 'event'},
+        {text: 'Type of Involvement', value: 'involvementType'},
+        {text: 'Designation', value: 'designation'},
         {text: 'Local', value: 'local'},
         {text: 'Date', value: 'date'},
+        {text: 'URL', value: 'url'},
         {text: 'Observations', value: 'observations'}
       ],
 
       defaultItem: {
         user: {},
+        members: [],
         eventType: '',
-        participationType: '',
-        title: '',
-        event: '',
+        involvementType: '',
+        designation: '',
         local: '',
         dateStart: null,
         dateFinish: null,
+        url: '',
         observations: '',
       }
+    }
+  },
+  methods: {
+    getMembersNames(members) {
+      const membersNames = members.map(m => m.name).join(', ');
+      return membersNames.length > 20 ? `${membersNames.substring(0, 17)}...` : membersNames;
     }
   }
 }

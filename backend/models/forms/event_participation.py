@@ -58,9 +58,6 @@ class EventParticipationFormCreate(EventParticipationFormBase):
 class AlchemyEventParticipationFormModel(Base, AlchemyModel):
     __tablename__ = "form_event_participation"
 
-    userId = Column(GUID, ForeignKey("user.id"))
-    user = relationship("AlchemyUserModel")
-
     eventType = Column(String(length=64), index=True, nullable=False)
     participationType = Column(String(length=64), index=True, nullable=False)
     title = Column(String(length=64), index=True, nullable=True)

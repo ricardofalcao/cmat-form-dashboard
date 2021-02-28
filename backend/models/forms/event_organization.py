@@ -5,7 +5,7 @@ from typing import Optional, List
 from fastapi_users.db.sqlalchemy import GUID
 from pydantic import UUID4, validator
 from sqlalchemy import Column, String, Date, Text, DateTime, func, ForeignKey, Table
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 
 from database import Base
 from models.forms import Form, AlchemyModel
@@ -65,15 +65,13 @@ class EventOrganizationFormCreate(EventOrganizationFormBase):
 
 
 user_association_table = Table('form_event_organization_members', Base.metadata,
-                               Column('member_id', GUID, ForeignKey('user.id')),
-                               Column('form_id', GUID, ForeignKey('form_event_organization.id'))
+                               Column('member_id', GUID, ForeignKey('user.id'), primary_key=True),
+                               Column('form_id', GUID, ForeignKey('form_event_organization.id'), primary_key=True)
                                )
+
 
 class AlchemyEventOrganizationFormModel(Base, AlchemyModel):
     __tablename__ = "form_event_organization"
-
-    userId = Column(GUID, ForeignKey("user.id"))
-    user = relationship("AlchemyUserModel")
 
     members = relationship("AlchemyUserModel", secondary=user_association_table)
 
@@ -91,3 +89,10 @@ class AlchemyEventOrganizationFormModel(Base, AlchemyModel):
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    def postInsert(self, db: Session, create_model: EventOrganizationFormCreate):
+        for member in create_model.members:
+            db.execute(user_association_table.insert(), params={'member_id': member, 'form_id': self.id})
+
+        db.commit()
+        db.refresh(self)

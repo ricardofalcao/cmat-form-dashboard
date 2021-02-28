@@ -56,12 +56,12 @@ const pages = [
             {
                 path: 'event-participation',
                 name: 'Participation in Events',
-                component: () => import('../views/admin/logs/LogEventParticipation.vue'),
+                component: () => import('../components/logs/LogEventParticipation.vue'),
             },
             {
                 path: 'event-organization',
                 name: 'Organization of Events',
-                component: () => import('../views/admin/logs/LogEventOrganization.vue'),
+                component: () => import('../components/logs/LogEventOrganization.vue'),
             }
         ]
     },
@@ -82,7 +82,19 @@ const pages = [
             sidebar: true,
             requiresAuth: true
         },
-        component: () => import('../views/EventParticipation.vue')
+        component: () => import('../views/forms/event-participation/EventParticipationRoot.vue'),
+        children: [
+            {
+                path: '',
+                name: 'Form',
+                component: () => import('../views/forms/event-participation/EventParticipationForm.vue'),
+            },
+            {
+                path: 'history',
+                name: 'History',
+                component: () => import('../views/forms/event-participation/EventParticipationHistory.vue'),
+            }
+        ]
     },
     {
         path: '/forms/event-organization',
@@ -91,8 +103,19 @@ const pages = [
             sidebar: true,
             requiresAuth: true
         },
-
-        component: () => import('../views/EventOrganization.vue')
+        component: () => import('../views/forms/event-organization/EventOrganizationRoot.vue'),
+        children: [
+            {
+                path: '',
+                name: 'Form',
+                component: () => import('../views/forms/event-organization/EventOrganizationForm.vue'),
+            },
+            {
+                path: 'history',
+                name: 'History',
+                component: () => import('../views/forms/event-organization/EventOrganizationHistory.vue'),
+            }
+        ]
     }
 ]
 
