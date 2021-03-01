@@ -5,7 +5,7 @@ from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import JWTAuthentication
 from fastapi_users.db import SQLAlchemyUserDatabase
 
-import database
+from database import Base, engine, DATABASE_URL
 from models.user import User, UserCreate, UserUpdate, UserDB, AlchemyUserModel
 from routes.auth import register_auth_routes
 from routes.form import register_form_routes
@@ -28,9 +28,9 @@ auth_backends.append(jwt_authentication)
 #
 
 
-database.Base.metadata.create_all(bind=database.engine)
+Base.metadata.create_all(bind=engine)
 
-raw_database = databases.Database(database.DATABASE_URL)
+raw_database = databases.Database(DATABASE_URL)
 fastapi_users = FastAPIUsers(
     SQLAlchemyUserDatabase(UserDB, raw_database, AlchemyUserModel.__table__),
     auth_backends,
@@ -70,6 +70,8 @@ app.include_router(
     prefix="/api",
     tags=["api"]
 )
+
+
 
 @app.on_event("startup")
 async def startup():

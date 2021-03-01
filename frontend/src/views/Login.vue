@@ -94,7 +94,7 @@
                     body: formBody.join('&')
                 };
 
-                fetch("http://localhost:8000/api/auth/jwt/login", requestOptions)
+                fetch(`${this.$apiUrl}/auth/jwt/login`, requestOptions)
                     .then(async response => {
                         const data = await response.json();
 

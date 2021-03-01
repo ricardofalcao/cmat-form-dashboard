@@ -119,4 +119,9 @@ const pages = [
     }
 ]
 
-export default pages
+const apiUrl = 'https://mat.ricardofalcao.pt/api'
+
+export default {
+    pages,
+    apiUrl
+}

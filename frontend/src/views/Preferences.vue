@@ -90,7 +90,7 @@
                 this.pending = true;
                 this.snackbar = false;
 
-                fetch(`http://localhost:8000/api/users/me`, {
+                fetch(`${this.$apiUrl}/users/me`, {
                     method: "PATCH",
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("jwt")}`,

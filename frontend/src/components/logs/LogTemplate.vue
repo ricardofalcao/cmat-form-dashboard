@@ -413,7 +413,7 @@
 
                 this.schemasPending = true;
 
-                fetch(`http://localhost:8000/api/forms/${this.id}/exports/list`, {
+                fetch(`${this.$apiUrl}/forms/${this.id}/exports/list`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("jwt")}`,
                         'Content-Type': 'application/json',
@@ -443,7 +443,7 @@
 
                 const {sortBy, sortDesc, page, itemsPerPage} = this.options
 
-                let url = `http://localhost:8000/api/forms/${this.id}/list${this.userOnly ? '/me' : ''}?page=${page}&size=${itemsPerPage}`
+                let url = `${this.$apiUrl}/forms/${this.id}/list${this.userOnly ? '/me' : ''}?page=${page}&size=${itemsPerPage}`
 
                 if (sortBy.length === 1 && sortDesc.length === 1) {
                     url += `&sort=${sortBy[0]}&desc=${sortDesc[0]}`
@@ -499,7 +499,7 @@
 
                 this.editPending = true;
 
-                fetch(`http://localhost:8000/api/forms/${this.id}/${this.editedItem.id}`, {
+                fetch(`${this.$apiUrl}/forms/${this.id}/${this.editedItem.id}`, {
                     method: "PATCH",
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("jwt")}`,
@@ -558,7 +558,7 @@
 
                 this.deletePending = true;
 
-                fetch(`http://localhost:8000/api/forms/${this.id}/${this.editedItem.id}`, requestOptions)
+                fetch(`${this.$apiUrl}/forms/${this.id}/${this.editedItem.id}`, requestOptions)
                     .then(async response => {
                         if (!response.ok) {
                             return Promise.reject(response.status);
@@ -606,13 +606,13 @@
                 let url = '';
 
                 if (this.schemaIndex < 0) {
-                    url = `http://localhost:8000/api/forms/${this.id}/exports`
+                    url = `${this.$apiUrl}/forms/${this.id}/exports`
                     requestOptions['method'] = 'POST';
 
                     let body = Object.assign({}, this.schemaItem);
                     requestOptions['body'] = JSON.stringify(body)
                 } else {
-                    url = `http://localhost:8000/api/forms/${this.id}/exports/${this.schemaItem.id}`
+                    url = `${this.$apiUrl}/forms/${this.id}/exports/${this.schemaItem.id}`
                     requestOptions['method'] = 'PATCH';
 
                     let body = Object.assign({}, this.schemaItem);
@@ -674,7 +674,7 @@
 
                 this.schemasDeletePending = true;
 
-                fetch(`http://localhost:8000/api/forms/${this.id}/exports/${this.schemaItem.id}`, requestOptions)
+                fetch(`${this.$apiUrl}/forms/${this.id}/exports/${this.schemaItem.id}`, requestOptions)
                     .then(async response => {
                         if (!response.ok) {
                             return Promise.reject(response.status);

@@ -58,7 +58,7 @@
 
                 this.pending = true;
 
-                fetch(`http://localhost:8000/api/forms/${this.id}`, {
+                fetch(`${this.$apiUrl}/forms/${this.id}`, {
                     method: "POST",
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("jwt")}`,

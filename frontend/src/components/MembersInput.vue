@@ -105,7 +105,7 @@
 
                 this.pending = true;
 
-                let url = `http://localhost:8000/api/users/search?`
+                let url = `${this.$apiUrl}/users/search?`
                 for (let i = 0; i < members.length; i++) {
                     url += `q=${members[i]}&`
                 }

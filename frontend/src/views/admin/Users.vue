@@ -197,7 +197,7 @@
             fetchUsers() {
                 this.pending = true;
 
-                fetch(`http://localhost:8000/api/users/list`, {
+                fetch(`${this.$apiUrl}/users/list`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("jwt")}`,
                         'Content-Type': 'application/json',
@@ -239,7 +239,7 @@
 
                 this.deletePending = true;
 
-                fetch(`http://localhost:8000/api/users/${this.editedItem.id}`, requestOptions)
+                fetch(`${this.$apiUrl}/users/${this.editedItem.id}`, requestOptions)
                     .then(async response => {
                         if (!response.ok) {
                             return Promise.reject(response.status);
@@ -294,14 +294,14 @@
                 let url = '';
 
                 if (this.formCreate) {
-                    url = `http://localhost:8000/api/users/create`
+                    url = `${this.$apiUrl}/users/create`
                     requestOptions['method'] = 'POST';
 
                     let body = Object.assign({}, this.editedItem);
 
                     requestOptions['body'] = JSON.stringify(body)
                 } else {
-                    url = `http://localhost:8000/api/users/${this.editedItem.id}`
+                    url = `${this.$apiUrl}/users/${this.editedItem.id}`
                     requestOptions['method'] = 'PATCH';
 
                     let body = Object.assign({}, this.editedItem);
