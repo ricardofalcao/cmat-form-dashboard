@@ -60,20 +60,18 @@
                             <v-spacer></v-spacer>
                             <v-btn
                                     :disabled="editPending"
-                                    outlined
                                     text
                                     @click="close"
                             >
-                                Cancel
+                                CANCEL
                             </v-btn>
                             <v-btn
                                     color="green"
                                     :disabled="editPending"
-                                    outlined
                                     text
                                     @click="save"
                             >
-                                Save
+                                SAVE
                             </v-btn>
                         </v-card-actions>
                     </v-card>

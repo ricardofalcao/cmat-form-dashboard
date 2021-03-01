@@ -41,8 +41,21 @@
                             color="gray"
                             text
                     >
-                        Delete
+                        DELETE
                     </v-btn>
+
+                    <v-dialog v-model="dialogDelete" max-width="300">
+                        <v-card>
+                            <v-card-title class="headline">Delete this item?</v-card-title>
+                            <v-card-text>This action is irreversible</v-card-text>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="gray" text @click="closeDelete" :disabled="deletePending">CANCEL</v-btn>
+                                <v-btn color="error" text @click="deleteLogConfirm" :disabled="deletePending">DELETE</v-btn>
+                                <v-spacer></v-spacer>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -81,12 +94,16 @@
                 editedIndex: -1,
                 editedItem: Object.assign({}, this.defaultItem),
 
-                dialog: false
+                dialog: false,
+                dialogDelete: false
             }
         },
         watch: {
             dialog(val) {
                 val || this.close()
+            },
+            dialogDelete(val) {
+                val || this.closeDelete()
             },
             options: {
                 handler() {
@@ -147,6 +164,8 @@
 
             close() {
                 this.dialog = false
+                this.dialogDelete = false;
+
                 this.$nextTick(() => {
                     this.editedItem = Object.assign({}, this.defaultItem)
                     this.editedIndex = -1
@@ -158,6 +177,10 @@
                     return;
                 }
 
+                this.dialogDelete = true;
+            },
+
+            deleteLogConfirm() {
                 let requestOptions = {
                     method: 'DELETE',
                     headers: {
@@ -176,6 +199,7 @@
                         }
 
                         this.logs.splice(this.editedIndex, 1)
+                        this.fetchLogs()
                         this.close();
                     })
                     .catch(error => {
@@ -185,6 +209,10 @@
                         this.deletePending = false
                     });
             },
+
+            closeDelete() {
+                this.dialogDelete = false;
+            }
         }
     }
 </script>

@@ -14,7 +14,7 @@
       {{ item.title ? item.title : 'none' }}
     </template>
 
-    <template v-slot:table.date="{ item }">
+    <template v-slot:table.dateStart="{ item }">
       {{ `${item.dateStart}~${item.dateFinish}` }}
     </template>
 
@@ -108,8 +108,8 @@ export default {
         {text: 'Title', value: 'title'},
         {text: 'Event', value: 'event'},
         {text: 'Local', value: 'local'},
-        {text: 'Date', value: 'date'},
-        {text: 'Observations', value: 'observations'}
+        {text: 'Date', value: 'dateStart'},
+        {text: 'Observations', value: 'observations', sortable: false}
       ],
 
       defaultItem: {

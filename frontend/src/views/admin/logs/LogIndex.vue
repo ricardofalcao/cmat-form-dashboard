@@ -1,7 +1,7 @@
 <template>
-    <div class="log-index">
-        Hello
-    </div>
+    <v-card-text class="log-index">
+        Select a category
+    </v-card-text>
 </template>
 
 <script>

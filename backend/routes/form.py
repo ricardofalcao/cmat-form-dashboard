@@ -14,7 +14,7 @@ from models.forms.event_organization import EventOrganizationFormCreate, \
     EventOrganizationForm, AlchemyEventOrganizationFormModel
 from models.forms.event_participation import EventParticipationForm, EventParticipationFormCreate, \
     AlchemyEventParticipationFormModel
-from models.user import User
+from models.user import User, AlchemyUserModel
 
 
 def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
@@ -28,11 +28,13 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
         EventParticipationFormCreate,
         AlchemyEventParticipationFormModel,
         allowed_sorts=[
+            'user',
             'eventType',
             'participationType',
             'title',
             'event',
             'local',
+            'dateStart'
         ]
     )
 
@@ -44,10 +46,12 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
         EventOrganizationFormCreate,
         AlchemyEventOrganizationFormModel,
         allowed_sorts=[
+            'user',
             'eventType',
             'involvementType',
             'designation',
             'local',
+            'dateStart'
         ]
     )
 
@@ -113,29 +117,29 @@ def __register_form_routes(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
         if (not user.is_superuser) and (db_form.userId != user.id):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Only admins can delete non owned forms')
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail='Only admins can delete non owned forms')
 
         db.query(form_db_model).filter(form_db_model.id == id).delete()
         db.commit()
 
         return None
 
-    @router.get(f"/{form_name}/list/me", response_model=FormList)
-    async def formListMe(
+    def formListBase(
+            query: sqlalchemy.orm.Query,
             size: int,
             page: int,
             sort: Optional[str] = None,
             desc: Optional[str] = None,
-            user: User = Depends(fastapi_users.current_user()),
-            db: Session = Depends(get_database),
     ):
-        query = db.query(form_db_model, func.count(form_db_model.id).over().label('total')).filter(form_db_model.userId == user.id)
-
         if sort and sort in allowed_sorts:
-            attr = getattr(form_db_model, sort, None)
+            if sort == 'user':
+                attr = AlchemyUserModel.name
+                query = query.join(AlchemyUserModel)
+            else:
+                attr = getattr(form_db_model, sort, None)
 
             if attr:
-                attr = getattr(form_db_model, sort, None)
                 query = query.order_by(sqlalchemy.asc(attr) if desc == "false" else sqlalchemy.desc(attr))
 
         query = query.limit(size)
@@ -151,6 +155,26 @@ def __register_form_routes(
             forms.append(u[0])
 
         return FormList(forms=forms, total=total)
+
+    @router.get(f"/{form_name}/list/me", response_model=FormList)
+    async def formListMe(
+            size: int,
+            page: int,
+            sort: Optional[str] = None,
+            desc: Optional[str] = None,
+            user: User = Depends(fastapi_users.current_user()),
+            db: Session = Depends(get_database),
+    ):
+        query = db.query(form_db_model, func.count(form_db_model.id).over().label('total')).filter(
+            form_db_model.userId == user.id)
+
+        return formListBase(
+            query,
+            size,
+            page,
+            sort,
+            desc
+        )
 
     @router.get(f"/{form_name}/list", response_model=FormList)
     async def formList(
@@ -163,23 +187,10 @@ def __register_form_routes(
     ):
         query = db.query(form_db_model, func.count(form_db_model.id).over().label('total'))
 
-        if sort and sort in allowed_sorts:
-            attr = getattr(form_db_model, sort, None)
-
-            if attr:
-                attr = getattr(form_db_model, sort, None)
-                query = query.order_by(sqlalchemy.asc(attr) if desc == "false" else sqlalchemy.desc(attr))
-
-        query = query.limit(size)
-        query = query.offset((page - 1) * size)
-
-        result = query.all()
-
-        forms = []
-        total = 0
-
-        for u in result:
-            total = u[1]
-            forms.append(u[0])
-
-        return FormList(forms=forms, total=total)
+        return formListBase(
+            query,
+            size,
+            page,
+            sort,
+            desc
+        )

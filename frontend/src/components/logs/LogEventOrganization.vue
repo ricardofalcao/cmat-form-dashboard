@@ -14,7 +14,7 @@
       {{ getMembersNames(item.members) }}
     </template>
 
-    <template v-slot:table.date="{ item }">
+    <template v-slot:table.dateStart="{ item }">
       {{ `${item.dateStart}~${item.dateFinish}` }}
     </template>
 
@@ -114,9 +114,9 @@ export default {
         {text: 'Type of Involvement', value: 'involvementType'},
         {text: 'Designation', value: 'designation'},
         {text: 'Local', value: 'local'},
-        {text: 'Date', value: 'date'},
-        {text: 'URL', value: 'url'},
-        {text: 'Observations', value: 'observations'}
+        {text: 'Date', value: 'dateStart'},
+        {text: 'URL', value: 'url', sortable: false},
+        {text: 'Observations', value: 'observations', sortable: false}
       ],
 
       defaultItem: {
