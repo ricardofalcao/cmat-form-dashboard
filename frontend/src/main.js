@@ -3,7 +3,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import './assets/index.scss'
 
-import apiUrl from './utils/constants'
+import { apiUrl } from './utils/constants'
 
 import router from './router'
 import store from './store'
@@ -23,7 +23,7 @@ router.beforeEach((to, from, next) => {
                 params: {nextUrl: to.fullPath}
             })
         } else {
-            fetch(`${this.$apiUrl}/users/me`, {
+            fetch(`${Vue.prototype.$apiUrl}/users/me`, {
                 headers: {
                     'Authorization': 'Bearer ' + accessToken,
                     'Content-Type': 'application/json'

@@ -74,7 +74,7 @@
 </template>
 
 <script>
-    import pages from '@/utils/constants'
+    import { pages } from '@/utils/constants'
 
     export default {
         name: 'App',

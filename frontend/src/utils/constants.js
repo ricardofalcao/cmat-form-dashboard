@@ -119,9 +119,9 @@ const pages = [
     }
 ]
 
-const apiUrl = 'https://mat.ricardofalcao.pt/api'
+const apiUrl = 'http://localhost:8000/api'
 
-export default {
+export {
     pages,
     apiUrl
 }

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import pages from '../utils/constants'
+import { pages } from '../utils/constants'
 
 Vue.use(VueRouter)
 
