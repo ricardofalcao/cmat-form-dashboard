@@ -1,10 +1,10 @@
 from typing import List, Optional
 
 import sqlalchemy
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_users import FastAPIUsers, models
 from pydantic import UUID4
-from sqlalchemy import text, func
+from sqlalchemy import text, func, or_
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -35,6 +35,14 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
             'event',
             'local',
             'dateStart'
+        ],
+        search_fields=[
+            'user',
+            'eventType',
+            'participationType',
+            'title',
+            'event',
+            'local'
         ]
     )
 
@@ -52,6 +60,13 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
             'designation',
             'local',
             'dateStart'
+        ],
+        search_fields=[
+            'user',
+            'eventType',
+            'involvementType',
+            'designation',
+            'local'
         ]
     )
 
@@ -68,7 +83,8 @@ def __register_form_routes(
         form_model: Form,
         form_create_model: Form,
         form_db_model: AlchemyModel,
-        allowed_sorts: List[str] = []
+        allowed_sorts: List[str] = [],
+        search_fields: List[str] = []
 ):
     class FormList(models.BaseModel):
         forms: List[form_model]
@@ -131,7 +147,24 @@ def __register_form_routes(
             page: int,
             sort: Optional[str] = None,
             desc: Optional[str] = None,
+            q: Optional[str] = None,
     ):
+
+        if q:
+            filters = []
+            for field in search_fields:
+                if field == 'user':
+                    attr = AlchemyUserModel.name
+                    query = query.join(AlchemyUserModel)
+                else:
+                    attr = getattr(form_db_model, field, None)
+
+                if attr:
+                    filters.append(attr.contains(q))
+
+            if len(filters) > 0:
+                query = query.filter(or_(*filters))
+
         if sort and sort in allowed_sorts:
             if sort == 'user':
                 attr = AlchemyUserModel.name
@@ -144,6 +177,8 @@ def __register_form_routes(
 
         query = query.limit(size)
         query = query.offset((page - 1) * size)
+
+        print(query.statement.compile())
 
         result = query.all()
 
@@ -162,6 +197,7 @@ def __register_form_routes(
             page: int,
             sort: Optional[str] = None,
             desc: Optional[str] = None,
+            q: Optional[str] = Query(None, min_length=3),
             user: User = Depends(fastapi_users.current_user()),
             db: Session = Depends(get_database),
     ):
@@ -173,7 +209,8 @@ def __register_form_routes(
             size,
             page,
             sort,
-            desc
+            desc,
+            q
         )
 
     @router.get(f"/{form_name}/list", response_model=FormList)
@@ -182,6 +219,7 @@ def __register_form_routes(
             page: int,
             sort: Optional[str] = None,
             desc: Optional[str] = None,
+            q: Optional[str] = Query(None, min_length=3),
             user: User = Depends(fastapi_users.current_user(superuser=True)),
             db: Session = Depends(get_database),
     ):
@@ -192,5 +230,6 @@ def __register_form_routes(
             size,
             page,
             sort,
-            desc
+            desc,
+            q
         )
