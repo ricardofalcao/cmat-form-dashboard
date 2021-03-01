@@ -1,5 +1,5 @@
 <template>
-    <v-form v-model="valid">
+    <v-form ref="form" v-model="valid">
         <slot name="form"></slot>
 
         <v-btn
@@ -12,6 +12,23 @@
         >
             Submit
         </v-btn>
+
+        <v-snackbar
+                v-model="snackbar"
+        >
+            Success!
+
+            <template v-slot:action="{ attrs }">
+                <v-btn
+                        color="white"
+                        text
+                        v-bind="attrs"
+                        @click="snackbar = false"
+                >
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-form>
 </template>
 
@@ -29,7 +46,8 @@
         data() {
             return {
                 valid: false,
-                pending: false
+                pending: false,
+                snackbar: false
             }
         },
         methods: {
@@ -58,7 +76,9 @@
                             return Promise.reject(error);
                         }
 
-                        console.log(data)
+                        this.snackbar = true;
+                        this.$emit('submit', data)
+                        this.$refs.form.reset()
                     })
                     .catch(error => {
                         console.log(error);

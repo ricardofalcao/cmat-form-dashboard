@@ -5,6 +5,7 @@
                 <h4 class="text-h4 mb-4">Preferences</h4>
 
                 <v-form
+                        ref="form"
                         v-model="valid">
 
                     <v-text-field

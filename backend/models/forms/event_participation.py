@@ -44,15 +44,20 @@ class EventParticipationFormCreate(EventParticipationFormBase):
     @validator("date")
     def date_order(cls, v):
         assert len(v) == 2, 'The number of date elements must be 2!'
+        v.sort()
+
         return v
 
-    def create_update_dict(self):
+    def create_dict(self):
+        return {**self.update_dict(), 'id': self.id}
+
+    def update_dict(self):
         this_dict = self.dict(
             exclude_unset=True,
-            exclude={"date"}
+            exclude={"date", "id"}
         )
 
-        return {**this_dict, 'dateStart': self.date[0], 'dateFinish': self.date[1], 'id': self.id}
+        return {**this_dict, 'dateStart': self.date[0], 'dateFinish': self.date[1]}
 
 
 class AlchemyEventParticipationFormModel(Base, AlchemyModel):

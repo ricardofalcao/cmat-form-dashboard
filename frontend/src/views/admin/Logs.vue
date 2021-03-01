@@ -10,7 +10,9 @@
                 </v-tab>
             </v-tabs>
 
-            <router-view></router-view>
+            <div class="mt-4">
+                <router-view></router-view>
+            </div>
         </v-card>
     </div>
 </template>

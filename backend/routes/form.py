@@ -1,10 +1,11 @@
+from datetime import date
 from typing import List, Optional
 
 import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi_users import FastAPIUsers, models
 from pydantic import UUID4
-from sqlalchemy import text, func, or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -14,6 +15,8 @@ from models.forms.event_organization import EventOrganizationFormCreate, \
     EventOrganizationForm, AlchemyEventOrganizationFormModel
 from models.forms.event_participation import EventParticipationForm, EventParticipationFormCreate, \
     AlchemyEventParticipationFormModel
+from models.forms.export.export_schema import ExportSchema, ExportSchemaCreate, AlchemyExportSchemaModel, \
+    ExportSchemaList
 from models.user import User, AlchemyUserModel
 
 
@@ -98,7 +101,7 @@ def __register_form_routes(
     ):
 
         created_form = form_db_model(
-            **form.create_update_dict(),
+            **form.create_dict(),
             userId=user.id,
         )
 
@@ -119,6 +122,31 @@ def __register_form_routes(
         db_form = db.query(form_db_model).filter(form_db_model.id == id).first()
         if db_form is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        return db_form
+
+    @router.patch(f"/{form_name}/{{id:uuid}}", response_model=form_model)
+    async def formUpdate(
+            id: UUID4,
+            form: form_create_model,
+            user: User = Depends(fastapi_users.current_user()),
+            db: Session = Depends(get_database)
+    ):
+        db_form = db.query(form_db_model).filter(form_db_model.id == id).first()
+        if db_form is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        if (not user.is_superuser) and (db_form.userId != user.id):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail='Only admins can update non owned forms')
+
+        for key, value in form.update_dict().items():
+            setattr(db_form, key, value)
+
+        db.commit()
+        db.refresh(db_form)
+
+        db_form.postUpdate(db, form)
 
         return db_form
 
@@ -145,6 +173,8 @@ def __register_form_routes(
             query: sqlalchemy.orm.Query,
             size: int,
             page: int,
+            date_from: Optional[date] = None,
+            date_to: Optional[date] = None,
             sort: Optional[str] = None,
             desc: Optional[str] = None,
             q: Optional[str] = None,
@@ -165,6 +195,19 @@ def __register_form_routes(
             if len(filters) > 0:
                 query = query.filter(or_(*filters))
 
+        attr = getattr(form_db_model, 'dateStart', None)
+        if attr:
+            if date_from and date_to and date_to < date_from:
+                temp = date_to
+                date_to = date_from
+                date_from = temp
+
+            if date_from:
+                query = query.filter(attr >= date_from)
+
+            if date_to:
+                query = query.filter(attr <= date_to)
+
         if sort and sort in allowed_sorts:
             if sort == 'user':
                 attr = AlchemyUserModel.name
@@ -177,8 +220,6 @@ def __register_form_routes(
 
         query = query.limit(size)
         query = query.offset((page - 1) * size)
-
-        print(query.statement.compile())
 
         result = query.all()
 
@@ -195,6 +236,8 @@ def __register_form_routes(
     async def formListMe(
             size: int,
             page: int,
+            date_from: Optional[date] = None,
+            date_to: Optional[date] = None,
             sort: Optional[str] = None,
             desc: Optional[str] = None,
             q: Optional[str] = Query(None, min_length=3),
@@ -208,6 +251,8 @@ def __register_form_routes(
             query,
             size,
             page,
+            date_from,
+            date_to,
             sort,
             desc,
             q
@@ -217,6 +262,8 @@ def __register_form_routes(
     async def formList(
             size: int,
             page: int,
+            date_from: Optional[date] = None,
+            date_to: Optional[date] = None,
             sort: Optional[str] = None,
             desc: Optional[str] = None,
             q: Optional[str] = Query(None, min_length=3),
@@ -229,7 +276,73 @@ def __register_form_routes(
             query,
             size,
             page,
+            date_from,
+            date_to,
             sort,
             desc,
             q
         )
+
+    @router.post(f"/{form_name}/exports", response_model=ExportSchema)
+    async def exportsCreate(
+            export: ExportSchemaCreate,
+            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            db: Session = Depends(get_database)
+    ):
+
+        created_export = AlchemyExportSchemaModel(
+            **export.create_dict(),
+            userId=user.id,
+            type=form_name
+        )
+
+        db.add(created_export)
+        db.commit()
+        db.refresh(created_export)
+
+        return created_export
+
+    @router.patch(f"/{form_name}/exports/{{id:uuid}}", response_model=ExportSchema)
+    async def exportsUpdate(
+            id: UUID4,
+            export: ExportSchemaCreate,
+            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            db: Session = Depends(get_database)
+    ):
+
+        schema = db.query(AlchemyExportSchemaModel).filter(AlchemyExportSchemaModel.id == id).first()
+        if schema is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        for key, value in export.update_dict().items():
+            setattr(schema, key, value)
+
+        db.commit()
+        db.refresh(schema)
+
+        return schema
+
+    @router.delete(f"/{form_name}/exports/{{id:uuid}}", status_code=status.HTTP_204_NO_CONTENT)
+    async def exportsDelete(
+            id: UUID4,
+            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            db: Session = Depends(get_database)
+    ):
+
+        schema = db.query(AlchemyExportSchemaModel).filter(AlchemyExportSchemaModel.id == id).first()
+        if schema is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        db.query(AlchemyExportSchemaModel).filter(AlchemyExportSchemaModel.id == id).delete()
+        db.commit()
+
+        return schema
+
+    @router.get(f"/{form_name}/exports/list", response_model=ExportSchemaList)
+    async def exportsList(
+            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            db: Session = Depends(get_database)
+    ):
+
+        schemas = db.query(AlchemyExportSchemaModel).filter(AlchemyExportSchemaModel.type == form_name).all()
+        return ExportSchemaList(schemas=schemas)

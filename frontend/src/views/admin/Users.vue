@@ -30,7 +30,7 @@
                         </v-card-title>
 
                         <v-card-text>
-                            <v-container>
+                            <v-form v-model="valid">
                                 <v-text-field
                                         v-model="editedItem.name"
                                         :disabled="editPending"
@@ -53,10 +53,35 @@
                                         :disabled="editPending"
                                         label="Admin"
                                 ></v-checkbox>
-                            </v-container>
+                            </v-form>
                         </v-card-text>
 
                         <v-card-actions>
+                            <v-btn
+                                    v-if="editedIndex >= 0"
+                                    color="red"
+                                    :disabled="editPending"
+                                    text
+                                    @click="deleteItem"
+                            >
+                                DELETE
+                            </v-btn>
+                            <v-dialog v-model="dialogDelete" max-width="300">
+                                <v-card>
+                                    <v-card-title class="headline">Delete this item?</v-card-title>
+                                    <v-card-text>This action is irreversible</v-card-text>
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn color="gray" text @click="closeDelete" :disabled="deletePending">CANCEL
+                                        </v-btn>
+                                        <v-btn color="error" text @click="deleteItemConfirm" :disabled="deletePending">
+                                            DELETE
+                                        </v-btn>
+                                        <v-spacer></v-spacer>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
+
                             <v-spacer></v-spacer>
                             <v-btn
                                     :disabled="editPending"
@@ -65,6 +90,7 @@
                             >
                                 CANCEL
                             </v-btn>
+
                             <v-btn
                                     color="green"
                                     :disabled="editPending"
@@ -93,6 +119,7 @@
                     :items-per-page="10"
                     :search="search"
                     :loading="pending"
+                    @click:row="editItem"
 
                     sort-by="name"
                     loading-text="Loading... Please wait"
@@ -103,35 +130,6 @@
                             v-model="item.is_superuser"
                             disabled
                     ></v-simple-checkbox>
-                </template>
-
-                <template v-slot:item.actions="{ item }">
-                    <v-icon
-                            small
-                            class="mr-2"
-                            @click="editItem(item)"
-                    >
-                        mdi-pencil
-                    </v-icon>
-                    <v-icon
-                            small
-                            @click="deleteItem(item)"
-                    >
-                        mdi-delete
-                    </v-icon>
-
-                    <v-dialog v-model="dialogDelete" max-width="300">
-                        <v-card>
-                            <v-card-title class="headline">Delete this item?</v-card-title>
-                            <v-card-text>This action is irreversible</v-card-text>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="gray" text @click="closeDelete" :disabled="deletePending">CANCEL</v-btn>
-                                <v-btn color="error" text @click="deleteItemConfirm" :disabled="deletePending">DELETE</v-btn>
-                                <v-spacer></v-spacer>
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
                 </template>
 
             </v-data-table>
@@ -148,10 +146,11 @@
                     {text: 'Name', value: 'name'},
                     {text: 'Email', value: 'email'},
                     {text: 'Admin', value: 'is_superuser'},
-                    {text: 'Actions', value: 'actions', sortable: false},
                 ],
+
                 users: [],
                 search: '',
+                valid: false,
 
                 editedIndex: -1,
                 editedItem: {
@@ -172,7 +171,6 @@
                 deletePending: false,
 
                 dialog: false,
-
                 dialogDelete: false,
             }
         },
@@ -225,10 +223,7 @@
                     });
             },
 
-            deleteItem(item) {
-                this.editedIndex = this.users.indexOf(item)
-                this.editedItem = Object.assign({}, item)
-
+            deleteItem() {
                 this.dialogDelete = true
             },
 
@@ -251,7 +246,8 @@
                         }
 
                         this.users.splice(this.editedIndex, 1)
-                        this.closeDelete();
+                        this.fetchUsers()
+                        this.close();
                     })
                     .catch(error => {
                         console.log(error);
@@ -264,10 +260,6 @@
 
             closeDelete() {
                 this.dialogDelete = false
-                this.$nextTick(() => {
-                    this.editedItem = Object.assign({}, this.defaultItem)
-                    this.editedIndex = -1
-                })
             },
 
             editItem(item) {
@@ -279,6 +271,8 @@
 
             close() {
                 this.dialog = false
+                this.dialogDelete = false
+
                 this.$nextTick(() => {
                     this.editedItem = Object.assign({}, this.defaultItem)
                     this.editedIndex = -1
@@ -286,6 +280,10 @@
             },
 
             save() {
+                if (!this.valid) {
+                    return;
+                }
+
                 let requestOptions = {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("jwt")}`,
@@ -326,10 +324,11 @@
                         }
 
                         if (this.editedIndex >= 0) {
-                            this.users.splice(this.editedIndex, 1)
+                            this.users[this.editedIndex] = Object.assign(this.users[this.editedIndex], data);
+                        } else {
+                            this.users.push(data);
                         }
 
-                        this.users.push(data);
                         this.close();
                     })
                     .catch(error => {

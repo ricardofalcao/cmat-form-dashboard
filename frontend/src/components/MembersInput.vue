@@ -4,6 +4,12 @@
                 :value="members"
                 @input="updateMembers($event)"
 
+                :rules="[
+                                        v => !!v || 'Member list is required',
+                                        v => v.length > 0 || 'At least one member must be specified',
+                                    ]"
+                required
+
                 :items="entries"
 
                 clearable
@@ -69,6 +75,15 @@
                 entries: [],
             }
         },
+        mounted() {
+            let members = []
+
+            for (let i = 0; i < this.members.length; i++) {
+                members.push(this.members[i].name)
+            }
+
+            this.fetchMembers(members)
+        },
         methods: {
             removeMember(member) {
                 const index = this.members.indexOf(member)
@@ -82,21 +97,20 @@
                 this.$nextTick(() => {
                     this.search = null;
                 });
-            }
-        },
-        watch: {
-            search(input) {
-                if (!input || input.length < 3) {
-                    return
-                }
-
-                if (this.pending) {
+            },
+            fetchMembers(members) {
+                if (members.length == 0 || this.pending) {
                     return;
                 }
 
                 this.pending = true;
 
-                fetch(`http://localhost:8000/api/users/search?q=${input}`, {
+                let url = `http://localhost:8000/api/users/search?`
+                for (let i = 0; i < members.length; i++) {
+                    url += `q=${members[i]}&`
+                }
+
+                fetch(url, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("jwt")}`,
                         'Content-Type': 'application/json'
@@ -129,6 +143,15 @@
                     .finally(() => {
                         this.pending = false
                     });
+            }
+        },
+        watch: {
+            search(input) {
+                if (!input || input.length < 3) {
+                    return
+                }
+
+                this.fetchMembers([input])
             }
         }
     }

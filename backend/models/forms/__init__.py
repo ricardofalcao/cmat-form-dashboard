@@ -1,12 +1,16 @@
-from fastapi_users import models
 from fastapi_users.db.sqlalchemy import GUID
+from pydantic import BaseModel
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, Session
 
 
-class Form(models.BaseModel):
-    pass
+class Form(BaseModel):
+    def create_dict(self):
+        pass
+
+    def update_dict(self):
+        pass
 
 
 class AlchemyModel:
@@ -21,6 +25,9 @@ class AlchemyModel:
         return relationship("AlchemyUserModel")
 
     def postInsert(self, db: Session, create_model):
+        pass
+
+    def postUpdate(self, db: Session, create_model):
         pass
 
     __mapper_args__ = {'polymorphic_on': userId}

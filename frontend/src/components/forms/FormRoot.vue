@@ -16,7 +16,7 @@
                 </v-tabs>
             </v-tabs>
 
-            <v-card-text class="mt-4">
+            <v-card-text>
 
                 <router-view></router-view>
 

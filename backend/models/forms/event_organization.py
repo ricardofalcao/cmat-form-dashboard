@@ -53,18 +53,23 @@ class EventOrganizationFormCreate(EventOrganizationFormBase):
     @validator("date")
     def date_order(cls, v):
         assert len(v) == 2, 'The number of date elements must be 2!'
+        v.sort()
+
         return v
 
-    def create_update_dict(self):
+    def create_dict(self):
+        return {**self.update_dict(), 'id': self.id}
+
+    def update_dict(self):
         this_dict = self.dict(
             exclude_unset=True,
-            exclude={"date", "members"}
+            exclude={"date", "id", "members"}
         )
 
-        return {**this_dict, 'dateStart': self.date[0], 'dateFinish': self.date[1], 'id': self.id}
+        return {**this_dict, 'dateStart': self.date[0], 'dateFinish': self.date[1]}
 
 
-user_association_table = Table('form_event_organization_members', Base.metadata,
+user_association_table: Table = Table('form_event_organization_members', Base.metadata,
                                Column('member_id', GUID, ForeignKey('user.id'), primary_key=True),
                                Column('form_id', GUID, ForeignKey('form_event_organization.id'), primary_key=True)
                                )
@@ -89,6 +94,18 @@ class AlchemyEventOrganizationFormModel(Base, AlchemyModel):
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    def postUpdate(self, db: Session, create_model: EventOrganizationFormCreate):
+        this_members_ids = map(lambda m: m.id, self.members)
+
+        for member in create_model.members:
+            if member not in this_members_ids:
+                db.execute(user_association_table.insert(), params={'member_id': member, 'form_id': self.id})
+
+        self.members = [x for x in self.members if x.id in create_model.members]
+
+        db.commit()
+        db.refresh(self)
 
     def postInsert(self, db: Session, create_model: EventOrganizationFormCreate):
         for member in create_model.members:

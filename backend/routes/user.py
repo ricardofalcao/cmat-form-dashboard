@@ -1,7 +1,10 @@
+from typing import List
+
 from fastapi import APIRouter, Query, Depends, HTTPException
 from fastapi_users import FastAPIUsers
 from fastapi_users.router import ErrorCode
 from fastapi_users.user import UserAlreadyExists
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -14,11 +17,16 @@ def register_user_routes(router: APIRouter, fastapi_users: FastAPIUsers):
 
     @users_router.get("/search", response_model=UserList)
     async def users_list(
-            q: str = Query(..., min_length=3, max_length=64),
+            q: List[str] = Query(..., min_length=3, max_length=64),
             user: User = Depends(fastapi_users.current_user()),
             db: Session = Depends(get_database)
     ):
-        query = db.query(AlchemyUserModel).filter(AlchemyUserModel.name.contains(q)).all()
+        conds = []
+
+        for name in q:
+            conds.append(AlchemyUserModel.name.contains(name))
+
+        query = db.query(AlchemyUserModel).filter(or_(*conds)).all()
 
         return {
             "users": query
