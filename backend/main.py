@@ -53,7 +53,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost",
-        "http://localhost:8000",
+        "http://localhost:8080",
         "https://mat.ricardofalcao.pt"
     ],
     allow_credentials=True,

@@ -8,7 +8,7 @@
                 label="Filter"
                 single-line
                 hide-details
-                class="m-6"
+                class="ma-6"
         ></v-text-field>
 
         <v-menu
@@ -20,7 +20,7 @@
         >
             <template v-slot:activator="{ on, attrs }">
                 <v-text-field
-                        class="m-6"
+                        class="ma-6"
                         :value="formatDate"
                         prepend-icon="mdi-calendar"
                         append-icon="mdi-close"
@@ -66,7 +66,7 @@
                 <v-menu offset-y>
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn
-                                class="m-4"
+                                class="ma-4"
                                 color="primary"
                                 outlined
 

@@ -32,6 +32,7 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
         AlchemyEventParticipationFormModel,
         allowed_sorts=[
             'user',
+            'group',
             'eventType',
             'participationType',
             'title',
@@ -41,6 +42,7 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
         ],
         search_fields=[
             'user',
+            'group',
             'eventType',
             'participationType',
             'title',
@@ -186,6 +188,9 @@ def __register_form_routes(
                 if field == 'user':
                     attr = AlchemyUserModel.name
                     query = query.join(AlchemyUserModel)
+                elif field == 'group':
+                    attr = AlchemyUserModel.group
+                    query = query.join(AlchemyUserModel)
                 else:
                     attr = getattr(form_db_model, field, None)
 
@@ -211,6 +216,9 @@ def __register_form_routes(
         if sort and sort in allowed_sorts:
             if sort == 'user':
                 attr = AlchemyUserModel.name
+                query = query.join(AlchemyUserModel)
+            elif sort == 'group':
+                attr = AlchemyUserModel.group
                 query = query.join(AlchemyUserModel)
             else:
                 attr = getattr(form_db_model, sort, None)

@@ -46,7 +46,7 @@ def register_user_routes(router: APIRouter, fastapi_users: FastAPIUsers):
             superuser: User = Depends(fastapi_users.current_user(superuser=True)),
     ):
         try:
-            created_user = await fastapi_users.create_user(user, safe=True)
+            created_user = await fastapi_users.create_user(user, safe=False)
         except UserAlreadyExists:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
