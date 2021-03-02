@@ -15,7 +15,8 @@ from routes.auth import register_auth_routes
 from routes.form import register_form_routes
 from routes.user import register_user_routes
 
-app = FastAPI()
+base_prefix = os.getenv("API_PREFIX", "/api")
+app = FastAPI(root_path=base_prefix, docs_url=None, redoc_url=None)
 
 #
 #
@@ -64,20 +65,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-api_router = APIRouter()
+api_router = app.router
 register_auth_routes(api_router, fastapi_users, jwt_authentication)
 register_user_routes(api_router, fastapi_users)
 register_form_routes(api_router, fastapi_users)
-
-base_prefix = os.getenv("API_PREFIX", "/api")
-
-app.include_router(
-    api_router,
-    prefix=base_prefix,
-    tags=["api"]
-)
-
-
 
 @app.on_event("startup")
 async def startup():
