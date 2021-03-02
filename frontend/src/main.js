@@ -68,7 +68,7 @@ router.beforeEach((to, from, next) => {
     }
 })
 
-Vue.prototype.$apiUrl = process.env.API_URL
+Vue.prototype.$apiUrl = process.env.VUE_APP_API_URL
 
 new Vue({
     router,
