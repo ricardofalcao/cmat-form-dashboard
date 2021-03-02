@@ -3,8 +3,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import './assets/index.scss'
 
-import { apiUrl } from './utils/constants'
-
 import router from './router'
 import store from './store'
 
@@ -70,7 +68,7 @@ router.beforeEach((to, from, next) => {
     }
 })
 
-Vue.prototype.$apiUrl = apiUrl
+Vue.prototype.$apiUrl = process.env.VUE_APP_API_URL
 
 new Vue({
     router,

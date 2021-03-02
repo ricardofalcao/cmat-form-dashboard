@@ -1,17 +1,22 @@
+import os
+
 import databases
+
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import JWTAuthentication
 from fastapi_users.db import SQLAlchemyUserDatabase
 
-from database import Base, engine, DATABASE_URL
+from dbase import Base, engine, DATABASE_URL
+
 from models.user import User, UserCreate, UserUpdate, UserDB, AlchemyUserModel
 from routes.auth import register_auth_routes
 from routes.form import register_form_routes
 from routes.user import register_user_routes
 
-app = FastAPI()
+base_prefix = os.getenv("API_PREFIX", "/api")
+app = FastAPI(root_path=base_prefix, docs_url=None, redoc_url=None)
 
 #
 #
@@ -49,29 +54,17 @@ app.add_middleware(
     allow_origins=[
         "http://localhost",
         "http://localhost:8080",
-        "http://localhost:8000",
-        "http://192.168.1.153",
-        "http://192.168.1.153:8080",
-        "http://192.168.1.153:8000",
-        "*"
+        "https://mat.ricardofalcao.pt"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-api_router = APIRouter()
+api_router = app.router
 register_auth_routes(api_router, fastapi_users, jwt_authentication)
 register_user_routes(api_router, fastapi_users)
 register_form_routes(api_router, fastapi_users)
-
-app.include_router(
-    api_router,
-    prefix="/api",
-    tags=["api"]
-)
-
-
 
 @app.on_event("startup")
 async def startup():

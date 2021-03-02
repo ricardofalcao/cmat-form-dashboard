@@ -9,7 +9,7 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from starlette import status
 
-from database import get_database
+from dbase import get_database
 from models.forms import Form, AlchemyModel
 from models.forms.event_organization import EventOrganizationFormCreate, \
     EventOrganizationForm, AlchemyEventOrganizationFormModel
@@ -32,6 +32,7 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
         AlchemyEventParticipationFormModel,
         allowed_sorts=[
             'user',
+            'group',
             'eventType',
             'participationType',
             'title',
@@ -41,6 +42,7 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
         ],
         search_fields=[
             'user',
+            'group',
             'eventType',
             'participationType',
             'title',
@@ -179,13 +181,15 @@ def __register_form_routes(
             desc: Optional[str] = None,
             q: Optional[str] = None,
     ):
+        query = query.join(AlchemyUserModel)
 
         if q:
             filters = []
             for field in search_fields:
                 if field == 'user':
                     attr = AlchemyUserModel.name
-                    query = query.join(AlchemyUserModel)
+                elif field == 'group':
+                    attr = AlchemyUserModel.group
                 else:
                     attr = getattr(form_db_model, field, None)
 
@@ -211,7 +215,8 @@ def __register_form_routes(
         if sort and sort in allowed_sorts:
             if sort == 'user':
                 attr = AlchemyUserModel.name
-                query = query.join(AlchemyUserModel)
+            elif sort == 'group':
+                attr = AlchemyUserModel.group
             else:
                 attr = getattr(form_db_model, sort, None)
 

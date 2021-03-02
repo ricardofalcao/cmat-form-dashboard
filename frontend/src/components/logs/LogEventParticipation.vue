@@ -14,6 +14,10 @@
             {{ item.user.name }}
         </template>
 
+        <template v-slot:table.group="{ item }">
+            {{ item.user.group }}
+        </template>
+
         <template v-slot:table.title="{ item }">
             {{ item.title ? item.title : 'none' }}
         </template>
@@ -50,6 +54,7 @@
             return {
                 headers: [
                     {text: 'User', value: 'user'},
+                    {text: 'Group', value: 'group'},
                     {text: 'Type of Event', value: 'eventType'},
                     {text: 'Type of Participation', value: 'participationType'},
                     {text: 'Title', value: 'title'},

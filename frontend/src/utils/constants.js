@@ -119,9 +119,6 @@ const pages = [
     }
 ]
 
-const apiUrl = 'http://localhost:8000/api'
-
 export {
-    pages,
-    apiUrl
+    pages
 }
