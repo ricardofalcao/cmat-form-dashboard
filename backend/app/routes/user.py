@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from dbase import get_database
-from models.user import UserList, User, UserDB, UserCreate, AlchemyUserModel
+from models import UserList, User, UserCreate, AlchemyUserModel
 
 
 def register_user_routes(router: APIRouter, fastapi_users: FastAPIUsers):

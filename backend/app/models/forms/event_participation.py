@@ -2,10 +2,8 @@ import uuid
 from datetime import date
 from typing import Optional, List
 
-from fastapi_users.db.sqlalchemy import GUID
 from pydantic import UUID4, validator
-from sqlalchemy import Column, String, Date, Text, DateTime, func, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Date, Text, DateTime, func
 
 from dbase import Base
 from models.forms import Form, AlchemyModel

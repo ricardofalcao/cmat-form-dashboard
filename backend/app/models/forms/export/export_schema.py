@@ -7,7 +7,7 @@ from sqlalchemy import Column, String, Text, DateTime, func, ForeignKey
 from sqlalchemy.orm import relationship
 
 from dbase import Base
-from models.user import User
+from models import User
 
 
 #

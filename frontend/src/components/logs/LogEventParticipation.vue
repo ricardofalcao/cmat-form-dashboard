@@ -7,7 +7,7 @@
             :preprocess-outbound="preprocessForm"
             :preprocess-inbound="preprocessItem"
             :date-search="true"
-            :show-schemas="true"
+            :schema-vars="schemaVars"
     >
 
         <template v-slot:table.user="{ item }">
@@ -36,7 +36,6 @@
         <template #dialog="{ item }">
             <RawEventParticipation :form="item"></RawEventParticipation>
         </template>
-
     </LogTemplate>
 </template>
 
@@ -52,6 +51,18 @@
         },
         data() {
             return {
+                schemaVars: [
+                    {title: 'User', description: 'user.name | user.email | user.group'},
+                    {title: 'Group', description: 'group'},
+                    {title: 'Type of Event', description: 'eventType'},
+                    {title: 'Type of Participation', description: 'participationType'},
+                    {title: 'Title', description: 'title'},
+                    {title: 'Event', description: 'event'},
+                    {title: 'Local', description: 'local'},
+                    {title: 'Date', description: 'dateStart | dateFinish'},
+                    {title: 'Observations', description: 'observations'}
+                ],
+
                 headers: [
                     {text: 'User', value: 'user'},
                     {text: 'Group', value: 'group'},

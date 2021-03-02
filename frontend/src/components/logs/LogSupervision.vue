@@ -1,6 +1,6 @@
 <template>
     <LogTemplate
-            id="event-organization"
+            id="supervision"
             v-bind="$attrs"
             :headers="headers"
             :default-item="defaultItem"
@@ -14,8 +14,8 @@
             {{ item.user.name }}
         </template>
 
-        <template v-slot:table.members="{ item }">
-            {{ getMembersNames(item.members) }}
+        <template v-slot:table.supervisors="{ item }">
+            {{ getMembersNames(item.supervisors) }}
         </template>
 
         <template v-slot:table.dateStart="{ item }">
@@ -30,7 +30,7 @@
         </template>
 
         <template #dialog="{ item }">
-            <RawEventOrganization :form="item"></RawEventOrganization>
+            <RawSupervision :form="item"></RawSupervision>
         </template>
 
     </LogTemplate>
@@ -38,49 +38,54 @@
 
 <script>
     import LogTemplate from "@/components/logs/LogTemplate";
-    import RawEventOrganization from "@/components/forms/RawEventOrganization";
+    import RawSupervision from "@/components/forms/RawSupervision";
 
     export default {
-        name: 'LogEventOrganization',
+        name: 'LogSupervision',
         components: {
-            RawEventOrganization,
+            RawSupervision,
             LogTemplate
         },
         data() {
             return {
                 schemaVars: [
                     {title: 'User', description: 'user.name | user.email | user.group'},
-                    {title: 'Members', description: 'members (User[])'},
-                    {title: 'Type of Event', description: 'eventType'},
-                    {title: 'Type of Participation', description: 'participationType'},
-                    {title: 'Designation', description: 'designation'},
-                    {title: 'Local', description: 'local'},
+                    {title: 'Student', description: 'student | studentCountry'},
+                    {title: 'Supervisors', description: 'supervisors (User[])'},
+                    {title: 'Type', description: 'type'},
+                    {title: 'Situation', description: 'situation'},
+                    {title: 'Title', description: 'title'},
+                    {title: 'Institution', description: 'institution'},
+                    {title: 'Course', description: 'course'},
                     {title: 'Date', description: 'dateStart | dateFinish'},
-                    {title: 'URL', description: 'url'},
                     {title: 'Observations', description: 'observations'}
                 ],
 
                 headers: [
                     {text: 'User', value: 'user'},
-                    {text: 'Members', value: 'members'},
-                    {text: 'Type of Event', value: 'eventType'},
-                    {text: 'Type of Involvement', value: 'involvementType'},
-                    {text: 'Designation', value: 'designation'},
-                    {text: 'Local', value: 'local'},
+                    {text: 'Student', value: 'student'},
+                    {text: 'Student Country', value: 'studentCountry'},
+                    {text: 'Supervisors', value: 'supervisors'},
+                    {text: 'Type', value: 'type'},
+                    {text: 'Situation', value: 'situation'},
+                    {text: 'Title', value: 'title'},
+                    {text: 'Institution', value: 'institution'},
+                    {text: 'Course', value: 'course'},
                     {text: 'Date', value: 'dateStart'},
-                    {text: 'URL', value: 'url', sortable: false},
                     {text: 'Observations', value: 'observations', sortable: false}
                 ],
 
                 defaultItem: {
                     user: {},
-                    members: [],
-                    eventType: '',
-                    involvementType: '',
-                    designation: '',
-                    local: '',
+                    student: '',
+                    studentCountry: '',
+                    supervisors: [],
+                    type: '',
+                    situation: '',
+                    title: '',
+                    institution: '',
+                    course: '',
                     date: [],
-                    url: '',
                     observations: '',
                 }
             }
@@ -97,7 +102,7 @@
             },
             preprocessForm(form) {
                 const copy = Object.assign({}, form);
-                copy.members = copy.members.map(m => m.id)
+                copy.supervisors = copy.supervisors.map(m => m.id)
 
                 delete copy.dateStart
                 delete copy.dateFinish

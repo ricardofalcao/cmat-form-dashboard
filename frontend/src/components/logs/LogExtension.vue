@@ -1,6 +1,6 @@
 <template>
     <LogTemplate
-            id="event-organization"
+            id="extension"
             v-bind="$attrs"
             :headers="headers"
             :default-item="defaultItem"
@@ -30,7 +30,7 @@
         </template>
 
         <template #dialog="{ item }">
-            <RawEventOrganization :form="item"></RawEventOrganization>
+            <RawExtension :form="item"></RawExtension>
         </template>
 
     </LogTemplate>
@@ -38,12 +38,12 @@
 
 <script>
     import LogTemplate from "@/components/logs/LogTemplate";
-    import RawEventOrganization from "@/components/forms/RawEventOrganization";
+    import RawExtension from "@/components/forms/RawExtension";
 
     export default {
-        name: 'LogEventOrganization',
+        name: 'LogExtension',
         components: {
-            RawEventOrganization,
+            RawExtension,
             LogTemplate
         },
         data() {
@@ -51,36 +51,27 @@
                 schemaVars: [
                     {title: 'User', description: 'user.name | user.email | user.group'},
                     {title: 'Members', description: 'members (User[])'},
-                    {title: 'Type of Event', description: 'eventType'},
-                    {title: 'Type of Participation', description: 'participationType'},
-                    {title: 'Designation', description: 'designation'},
-                    {title: 'Local', description: 'local'},
+                    {title: 'Type', description: 'type'},
+                    {title: 'Description', description: 'description'},
                     {title: 'Date', description: 'dateStart | dateFinish'},
-                    {title: 'URL', description: 'url'},
                     {title: 'Observations', description: 'observations'}
                 ],
 
                 headers: [
                     {text: 'User', value: 'user'},
                     {text: 'Members', value: 'members'},
-                    {text: 'Type of Event', value: 'eventType'},
-                    {text: 'Type of Involvement', value: 'involvementType'},
-                    {text: 'Designation', value: 'designation'},
-                    {text: 'Local', value: 'local'},
+                    {text: 'Type', value: 'type'},
+                    {text: 'Description', value: 'description'},
                     {text: 'Date', value: 'dateStart'},
-                    {text: 'URL', value: 'url', sortable: false},
                     {text: 'Observations', value: 'observations', sortable: false}
                 ],
 
                 defaultItem: {
                     user: {},
                     members: [],
-                    eventType: '',
-                    involvementType: '',
-                    designation: '',
-                    local: '',
+                    type: '',
+                    description: '',
                     date: [],
-                    url: '',
                     observations: '',
                 }
             }

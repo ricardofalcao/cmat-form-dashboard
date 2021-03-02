@@ -1,5 +1,5 @@
 <template>
-  <LogEventOrganization :userOnly="true">
+  <LogEventOrganization :userOnly="true" :showSchemas="false">
 
   </LogEventOrganization>
 </template>

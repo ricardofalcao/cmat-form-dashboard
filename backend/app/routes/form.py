@@ -10,14 +10,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from dbase import get_database
-from models.forms import Form, AlchemyModel
-from models.forms.event_organization import EventOrganizationFormCreate, \
-    EventOrganizationForm, AlchemyEventOrganizationFormModel
-from models.forms.event_participation import EventParticipationForm, EventParticipationFormCreate, \
-    AlchemyEventParticipationFormModel
-from models.forms.export.export_schema import ExportSchema, ExportSchemaCreate, AlchemyExportSchemaModel, \
-    ExportSchemaList
-from models.user import User, AlchemyUserModel
+from models import *
 
 
 def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
@@ -72,6 +65,55 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
             'involvementType',
             'designation',
             'local'
+        ]
+    )
+
+    __register_form_routes(
+        forms_router,
+        fastapi_users,
+        'extension',
+        ExtensionForm,
+        ExtensionFormCreate,
+        AlchemyExtensionFormModel,
+        allowed_sorts=[
+            'user',
+            'type',
+            'dateStart'
+        ],
+        search_fields=[
+            'user',
+            'type',
+        ]
+    )
+
+    __register_form_routes(
+        forms_router,
+        fastapi_users,
+        'supervision',
+        SupervisionForm,
+        SupervisionFormCreate,
+        AlchemySupervisionFormModel,
+        allowed_sorts=[
+            'user',
+            'student',
+            'studentCountry',
+            'type',
+            'situation',
+            'title',
+            'institution',
+            'course',
+            'dateStart'
+        ],
+        search_fields=[
+            'user',
+            'student',
+            'studentCountry',
+            'type',
+            'situation',
+            'title',
+            'institution',
+            'course',
+            'type',
         ]
     )
 

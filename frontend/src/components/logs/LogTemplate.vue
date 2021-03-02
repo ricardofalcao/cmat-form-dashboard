@@ -76,12 +76,14 @@
                             EXPORT SELECTED
                         </v-btn>
                     </template>
-                    <v-list>
+                    <v-list v-if="schemas.length > 0">
                         <v-list-item
                                 v-for="(schema, index) in schemas"
                                 :key="index"
+
+                                @click="exportSchema(schema)"
                         >
-                            <v-list-item-title @click="exportSchema(schema)">{{ schema.name }}</v-list-item-title>
+                            <v-list-item-title>{{ schema.name }}</v-list-item-title>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -191,6 +193,37 @@
 
                                         label="Template"
                                 ></v-textarea>
+
+                                <v-select
+                                        :items="[
+                                            { name: 'Text', extension: 'txt' },
+                                            { name: 'Latex', extension: 'tex' },
+                                            { name: 'CSV', extension: 'csv' },
+                                        ]"
+                                        item-text="name"
+                                        item-value="extension"
+                                        v-model="schemaItem.extension"
+
+                                        label="Extension"
+                                ></v-select>
+
+                                <v-list v-if="schemaVars.length > 0" dense>
+                                    <v-subheader>VARIABLES</v-subheader>
+
+                                    <v-flex>
+                                        <v-row>
+                                            <v-col v-for="(svar, index) in schemaVars" :key="index">
+                                                <v-list-item>
+                                                    <v-list-item-content>
+                                                        <v-list-item-title>{{ svar.title }}</v-list-item-title>
+                                                        <v-list-item-subtitle>{{ svar.description }}
+                                                        </v-list-item-subtitle>
+                                                    </v-list-item-content>
+                                                </v-list-item>
+                                            </v-col>
+                                        </v-row>
+                                    </v-flex>
+                                </v-list>
                             </v-form>
                         </v-card-text>
 
@@ -299,12 +332,11 @@
             },
             showSchemas: {
                 type: Boolean,
-                default: false
+                default: true
             },
             schemaVars: {
-                type: Object,
-                default: () => {
-                }
+                type: Array,
+                default: () => []
             }
         },
         data() {
@@ -312,7 +344,8 @@
                 id: '',
                 user: {},
                 name: '',
-                template: ''
+                template: '',
+                extension: 'txt'
             }
 
             return {
@@ -697,6 +730,10 @@
             },
 
             exportSchema(schema) {
+                if (this.selectedLogs.length <= 0) {
+                    return;
+                }
+
                 const template = Handlebars.compile(schema.template);
                 const text = template({
                     items: this.selectedLogs
@@ -704,7 +741,7 @@
 
                 var element = document.createElement('a');
                 element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-                element.setAttribute('download', 'layout.txt');
+                element.setAttribute('download', `Export.${schema.extension}`);
 
                 element.style.display = 'none';
                 document.body.appendChild(element);
