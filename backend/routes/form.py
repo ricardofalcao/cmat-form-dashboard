@@ -9,7 +9,7 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 from starlette import status
 
-from database import get_database
+from dbase import get_database
 from models.forms import Form, AlchemyModel
 from models.forms.event_organization import EventOrganizationFormCreate, \
     EventOrganizationForm, AlchemyEventOrganizationFormModel

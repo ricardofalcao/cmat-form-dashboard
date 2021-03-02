@@ -4,7 +4,7 @@ from fastapi_users import models
 from fastapi_users.db import SQLAlchemyBaseUserTable
 from sqlalchemy import Column, String
 
-from database import Base
+from dbase import Base
 
 
 class User(models.BaseUser):

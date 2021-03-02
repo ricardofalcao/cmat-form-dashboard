@@ -8,7 +8,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from starlette import status
 
-from database import get_database
+from dbase import get_database
 from models.user import UserList, User, UserDB, UserCreate, AlchemyUserModel
 
 
