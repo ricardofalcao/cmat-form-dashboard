@@ -181,16 +181,15 @@ def __register_form_routes(
             desc: Optional[str] = None,
             q: Optional[str] = None,
     ):
+        query = query.join(AlchemyUserModel)
 
         if q:
             filters = []
             for field in search_fields:
                 if field == 'user':
                     attr = AlchemyUserModel.name
-                    query = query.join(AlchemyUserModel)
                 elif field == 'group':
                     attr = AlchemyUserModel.group
-                    query = query.join(AlchemyUserModel)
                 else:
                     attr = getattr(form_db_model, field, None)
 
@@ -216,10 +215,8 @@ def __register_form_routes(
         if sort and sort in allowed_sorts:
             if sort == 'user':
                 attr = AlchemyUserModel.name
-                query = query.join(AlchemyUserModel)
             elif sort == 'group':
                 attr = AlchemyUserModel.group
-                query = query.join(AlchemyUserModel)
             else:
                 attr = getattr(form_db_model, sort, None)
 
