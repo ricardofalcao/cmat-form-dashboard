@@ -18,6 +18,7 @@ class ExportSchemaBase(BaseModel):
     id: Optional[UUID4] = None
     name: str
     template: str
+    extension: str
 
     @validator("id", pre=True, always=True)
     def default_id(cls, v):
@@ -58,6 +59,7 @@ class AlchemyExportSchemaModel(Base):
     type = Column(String(length=64), index=True, nullable=False)
     name = Column(String(length=64), index=True, nullable=False)
     template = Column(Text, nullable=False)
+    extension = Column(String(length=64), index=True, nullable=False, default="txt")
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
