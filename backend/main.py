@@ -1,3 +1,5 @@
+import os
+
 import databases
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
@@ -65,9 +67,11 @@ register_auth_routes(api_router, fastapi_users, jwt_authentication)
 register_user_routes(api_router, fastapi_users)
 register_form_routes(api_router, fastapi_users)
 
+base_prefix = os.getenv("API_PREFIX", "/api")
+
 app.include_router(
     api_router,
-    prefix="/api",
+    prefix=base_prefix,
     tags=["api"]
 )
 
