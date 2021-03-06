@@ -1,58 +1,99 @@
 <template>
     <div class="members-input">
-        <v-autocomplete
-                :value="members"
-                @input="updateMembers($event)"
+        <template v-if="multiple">
+            <v-autocomplete
+                    :value="members"
+                    @input="updateMembers($event)"
 
-                :rules="[
+                    :rules="[
                                         v => !!v || 'Member list is required',
                                         v => v.length > 0 || 'At least one member must be specified',
                                     ]"
-                required
+                    required
 
-                :items="entries"
+                    :items="entries"
 
-                clearable
-                chips
-                deletable-chips
+                    clearable
+                    chips
+                    deletable-chips
 
-                :search-input.sync="search"
+                    :search-input.sync="search"
 
-                :label="label"
+                    :label="label"
 
-                item-text="name"
-                item-value="name"
+                    item-text="name"
+                    item-value="name"
 
-                multiple
-                auto-select-first
-                return-object
-        >
+                    :multiple="multiple"
+                    auto-select-first
+                    return-object
+            >
 
-            <template v-slot:selection="data">
-                <v-chip
-                        v-bind="data.attrs"
-                        :input-value="data.selected"
-                        close
-                        @click="data.select"
-                        @click:close="removeMember(data.item)"
-                >
-                    {{ data.item.name }}
-                </v-chip>
-            </template>
-
-            <template v-slot:item="data">
-                <template v-if="typeof data.item !== 'object'">
-                    <v-list-item-content v-text="data.item"></v-list-item-content>
+                <template v-slot:selection="data">
+                    <v-chip
+                            v-bind="data.attrs"
+                            :input-value="data.selected"
+                            close
+                            @click="data.select"
+                            @click:close="removeMember(data.item)"
+                    >
+                        {{ data.item.name }}
+                    </v-chip>
                 </template>
-                <template v-else>
-                    <v-list-item-content>
-                        <v-list-item-title v-html="data.item.name"></v-list-item-title>
-                        <v-list-item-subtitle v-html="data.item.email"></v-list-item-subtitle>
-                    </v-list-item-content>
-                </template>
-            </template>
 
-        </v-autocomplete>
+                <template v-slot:item="data">
+                    <template v-if="typeof data.item !== 'object'">
+                        <v-list-item-content v-text="data.item"></v-list-item-content>
+                    </template>
+                    <template v-else>
+                        <v-list-item-content>
+                            <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                            <v-list-item-subtitle v-html="data.item.email"></v-list-item-subtitle>
+                        </v-list-item-content>
+                    </template>
+                </template>
+
+            </v-autocomplete>
+        </template>
+        <template v-else>
+            <v-autocomplete
+                    :value="member"
+                    @input="updateMembers($event)"
+
+                    :rules="[
+                                        v => !!v || 'Please select a member',
+                                    ]"
+                    required
+
+                    :items="entries"
+
+                    clearable
+
+                    :search-input.sync="search"
+
+                    :label="label"
+
+                    item-text="name"
+                    item-value="name"
+
+                    auto-select-first
+                    return-object
+            >
+
+                <template v-slot:item="data">
+                    <template v-if="typeof data.item !== 'object'">
+                        <v-list-item-content v-text="data.item"></v-list-item-content>
+                    </template>
+                    <template v-else>
+                        <v-list-item-content>
+                            <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                            <v-list-item-subtitle v-html="data.item.email"></v-list-item-subtitle>
+                        </v-list-item-content>
+                    </template>
+                </template>
+
+            </v-autocomplete>
+        </template>
     </div>
 </template>
 
@@ -61,10 +102,22 @@
         name: "MembersInput",
         components: {},
         props: {
-            members: Array,
+            members: {
+                type: Array,
+                default: () => []
+            },
+            member: {
+                type: Object,
+                default: () => {
+                }
+            },
             label: {
                 type: String,
                 default: ''
+            },
+            multiple: {
+                type: Boolean,
+                default: true
             }
         },
         data() {
@@ -78,8 +131,14 @@
         async mounted() {
             let members = []
 
-            for (let i = 0; i < this.members.length; i++) {
-                members.push(this.members[i].name)
+            if (this.multiple) {
+
+                for (let i = 0; i < this.members.length; i++) {
+                    members.push(this.members[i].name)
+                }
+
+            } else {
+                members.push(this.member.name)
             }
 
             this.fetchMembers(members)
@@ -92,7 +151,12 @@
                 this.$emit('update:members', this.members);
             },
             updateMembers(members) {
-                this.$emit('update:members', members)
+                if (this.multiple) {
+                    this.$emit('update:members', members)
+                } else {
+                    this.$emit('update:member', members)
+                }
+
 
                 this.$nextTick(() => {
                     this.search = null;

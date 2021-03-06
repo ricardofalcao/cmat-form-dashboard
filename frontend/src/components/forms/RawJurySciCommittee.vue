@@ -1,0 +1,81 @@
+<template>
+    <div>
+        <MembersInput
+                :member.sync="form.member"
+                :multiple="false"
+                label="Member"
+        />
+
+        <v-select
+                :items="['Evaluator', 'Jury', 'Scientific committee', 'Other']"
+                v-model="form.type"
+
+                :rules="[
+                                        v => !!v || 'Type is required',
+                                    ]"
+                required
+
+                label="Type"
+        ></v-select>
+
+        <v-text-field
+                v-model="form.description"
+                :rules="[
+                                        v => !!v || 'Description is required',
+                                    ]"
+                required
+
+                label="Description"
+        ></v-text-field>
+
+        <v-menu
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+        >
+            <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                        :value="formatDate"
+                        label="Date"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                ></v-text-field>
+            </template>
+            <v-date-picker
+                    v-model="form.date"
+                    range
+            ></v-date-picker>
+        </v-menu>
+
+        <v-textarea
+                v-model="form.observations"
+                solo
+
+                name="input-7-4"
+                label="Observations"
+        ></v-textarea>
+    </div>
+</template>
+
+<script>
+    import MembersInput from "@/components/MembersInput";
+
+    export default {
+        name: 'RawJurySciCommittee',
+        components: {
+            MembersInput
+        },
+        props: {
+            form: {
+                type: Object
+            }
+        },
+        computed: {
+            formatDate() {
+                return this.form.date.join(' ~ ')
+            }
+        }
+    }
+</script>

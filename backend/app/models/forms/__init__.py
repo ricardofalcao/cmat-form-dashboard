@@ -22,7 +22,7 @@ class AlchemyModel:
 
     @declared_attr
     def user(cls):
-        return relationship("AlchemyUserModel")
+        return relationship("AlchemyUserModel", foreign_keys = [ cls.userId ])
 
     def postInsert(self, db: Session, create_model):
         pass

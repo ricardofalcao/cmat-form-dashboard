@@ -1,17 +1,20 @@
-from datetime import date
-from typing import List, Optional
+from typing import TypeVar, Generic
 
 import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi_users import FastAPIUsers, models
-from pydantic import UUID4
-from sqlalchemy import func, or_
+from fastapi_users import FastAPIUsers
+from pydantic.generics import GenericModel
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from starlette import status
 
 from dbase import get_database
 from models import *
 
+DataT = TypeVar('DataT')
+class FormList(GenericModel, Generic[DataT]):
+    forms: List[DataT]
+    total: Optional[int]
 
 def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
     forms_router = APIRouter()
@@ -117,6 +120,47 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
         ]
     )
 
+    __register_form_routes(
+        forms_router,
+        fastapi_users,
+        'jury-sci-committee',
+        JuryScientificCommitteeForm,
+        JuryScientificCommitteeFormCreate,
+        AlchemyJuryScientificCommitteeFormModel,
+        allowed_sorts=[
+            'user',
+            'type',
+            'dateStart'
+        ],
+        search_fields=[
+            'user',
+            'type'
+        ]
+    )
+
+    __register_form_routes(
+        forms_router,
+        fastapi_users,
+        'referring-editorial-act',
+        ReferringEditorialActForm,
+        ReferringEditorialActFormCreate,
+        AlchemyReferringEditorialActFormModel,
+        allowed_sorts=[
+            'user',
+            'type',
+            'regionType',
+            'publicationType',
+            'reviews',
+            'year'
+        ],
+        search_fields=[
+            'user',
+            'type',
+            'regionType',
+            'publicationType'
+        ]
+    )
+
     router.include_router(
         forms_router,
         prefix="/forms"
@@ -133,9 +177,6 @@ def __register_form_routes(
         allowed_sorts: List[str] = [],
         search_fields: List[str] = []
 ):
-    class FormList(models.BaseModel):
-        forms: List[form_model]
-        total: Optional[int]
 
     @router.post(f"/{form_name}", response_model=form_model, status_code=status.HTTP_201_CREATED)
     async def formCreate(
@@ -223,7 +264,7 @@ def __register_form_routes(
             desc: Optional[str] = None,
             q: Optional[str] = None,
     ):
-        query = query.join(AlchemyUserModel)
+        query = query.join(AlchemyUserModel, AlchemyUserModel.id == form_db_model.userId)
 
         if q:
             filters = []
@@ -277,9 +318,9 @@ def __register_form_routes(
             total = u[1]
             forms.append(u[0])
 
-        return FormList(forms=forms, total=total)
+        return FormList[form_model](forms=forms, total=total)
 
-    @router.get(f"/{form_name}/list/me", response_model=FormList)
+    @router.get(f"/{form_name}/list/me", response_model=FormList[form_model])
     async def formListMe(
             size: int,
             page: int,
@@ -305,7 +346,7 @@ def __register_form_routes(
             q
         )
 
-    @router.get(f"/{form_name}/list", response_model=FormList)
+    @router.get(f"/{form_name}/list", response_model=FormList[form_model])
     async def formList(
             size: int,
             page: int,

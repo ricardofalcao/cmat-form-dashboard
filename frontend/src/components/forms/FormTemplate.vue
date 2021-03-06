@@ -86,6 +86,10 @@
                     .finally(() => {
                         this.pending = false
                     });
+            },
+
+            reset() {
+                this.$refs.form.reset()
             }
         }
     }

@@ -1,5 +1,6 @@
 <template>
     <FormTemplate
+            ref="form"
             id="event-participation"
             :form="form"
             @submit="submitEvent"

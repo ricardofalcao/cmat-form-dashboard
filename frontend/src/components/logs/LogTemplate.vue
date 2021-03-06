@@ -66,6 +66,8 @@
                 <v-menu offset-y>
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn
+                                v-if="schemas.length > 0"
+
                                 class="ma-4"
                                 color="primary"
                                 outlined

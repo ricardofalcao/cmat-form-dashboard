@@ -1,29 +1,29 @@
 <template>
     <FormTemplate
             ref="form"
-            id="extension"
+            id="jury-sci-committee"
             :form="submittableForm"
             @submit="submitEvent"
     >
         <template #form>
-            <RawExtension :form="form"></RawExtension>
+            <RawJurySciCommittee :form="form"></RawJurySciCommittee>
         </template>
     </FormTemplate>
 </template>
 
 <script>
     import FormTemplate from "@/components/forms/FormTemplate";
-    import RawExtension from "@/components/forms/RawExtension";
+    import RawJurySciCommittee from "@/components/forms/RawJurySciCommittee";
 
     export default {
-        name: 'ExtensionForm',
+        name: 'JurySciCommitteeForm',
         components: {
-            RawExtension,
+            RawJurySciCommittee,
             FormTemplate
         },
         data() {
             const _defaultForm = {
-                members: [],
+                member: {},
                 type: '',
                 description: '',
                 date: [],
@@ -38,7 +38,7 @@
         computed: {
             submittableForm() {
                 const copy = Object.assign({}, this.form);
-                copy.members = copy.members.map(m => m.id)
+                copy.member = copy.member.id
 
                 return copy
             }
