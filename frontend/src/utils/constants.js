@@ -60,7 +60,7 @@ const pages = [
             },
             {
                 path: 'event-organization',
-                name: 'Organization of Events',
+                name: 'Organisation of Events',
                 component: () => import('../components/logs/LogEventOrganization.vue'),
             },
             {
@@ -75,7 +75,7 @@ const pages = [
             },
             {
                 path: 'jury-sci-committee',
-                name: 'Jury Scientific Committee',
+                name: 'Jury / Scientific Committee',
                 component: () => import('../components/logs/LogJurySciCommittee.vue'),
             },
             {
@@ -118,7 +118,7 @@ const pages = [
     },
     {
         path: '/forms/event-organization',
-        name: 'Organization of Events',
+        name: 'Organisation of Events',
         meta: {
             sidebar: true,
             requiresAuth: true
@@ -181,7 +181,7 @@ const pages = [
     },
     {
         path: '/forms/jury-sci-committee',
-        name: 'Jury Scientific Committee',
+        name: 'Jury / Scientific Committee',
         meta: {
             sidebar: true,
             requiresAuth: true

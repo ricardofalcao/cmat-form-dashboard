@@ -66,8 +66,8 @@ class ExtensionFormCreate(ExtensionFormBase):
 
 
 user_association_table: Table = Table('form_extension_members', Base.metadata,
-                               Column('member_id', GUID, ForeignKey('user.id'), primary_key=True),
-                               Column('form_id', GUID, ForeignKey('form_extension.id'), primary_key=True)
+                               Column('member_id', GUID, ForeignKey('user.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True),
+                               Column('form_id', GUID, ForeignKey('form_extension.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
                                )
 
 

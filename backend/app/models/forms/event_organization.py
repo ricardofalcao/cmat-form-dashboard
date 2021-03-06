@@ -70,8 +70,8 @@ class EventOrganizationFormCreate(EventOrganizationFormBase):
 
 
 user_association_table: Table = Table('form_event_organization_members', Base.metadata,
-                               Column('member_id', GUID, ForeignKey('user.id'), primary_key=True),
-                               Column('form_id', GUID, ForeignKey('form_event_organization.id'), primary_key=True)
+                               Column('member_id', GUID, ForeignKey('user.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True),
+                               Column('form_id', GUID, ForeignKey('form_event_organization.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
                                )
 
 

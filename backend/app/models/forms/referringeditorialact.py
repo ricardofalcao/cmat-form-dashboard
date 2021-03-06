@@ -56,7 +56,7 @@ class ReferringEditorialActFormCreate(ReferringEditorialActFormBase):
 class AlchemyReferringEditorialActFormModel(Base, AlchemyModel):
     __tablename__ = "form_referring_editorial_act"
 
-    memberId = Column(GUID, ForeignKey("user.id"))
+    memberId = Column(GUID, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
     member = relationship("AlchemyUserModel", foreign_keys=[ memberId ])
 
     type = Column(String(length=64), index=True, nullable=False)

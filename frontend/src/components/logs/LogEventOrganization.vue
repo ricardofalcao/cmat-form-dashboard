@@ -49,7 +49,7 @@
         data() {
             return {
                 schemaVars: [
-                    {title: 'User', description: 'user.name | user.email | user.group'},
+                    {title: 'User', description: 'user.name | user.shortName | user.authorName | user.email | user.group'},
                     {title: 'Members', description: 'members (User[])'},
                     {title: 'Type of Event', description: 'eventType'},
                     {title: 'Type of Participation', description: 'participationType'},

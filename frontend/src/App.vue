@@ -8,6 +8,7 @@
       <v-navigation-drawer
           v-model="drawer"
           app
+          class="elevation-1"
       >
         <v-list dense>
           <v-list-item
@@ -44,9 +45,12 @@
           </v-list-item>
         </v-list>
 
+        <template #append>
+          <v-img class="d-none d-sm-block" src="/images/CMAT-logo-blue.png"></v-img>
+        </template>
       </v-navigation-drawer>
 
-      <v-app-bar app dark>
+      <v-app-bar app dark color="primary">
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
         <v-toolbar-title>CMAT Indicators</v-toolbar-title>
@@ -61,7 +65,7 @@
           <v-icon>mdi-cog-outline</v-icon>
         </v-btn>
 
-        <v-btn @click="logout">
+        <v-btn @click="logout" dark color="white" outlined>
           Logout
         </v-btn>
       </v-app-bar>

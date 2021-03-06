@@ -53,7 +53,7 @@ class AlchemyExportSchemaModel(Base):
 
     id = Column(GUID, primary_key=True)
 
-    userId = Column(GUID, ForeignKey("user.id"))
+    userId = Column(GUID, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
     user = relationship("AlchemyUserModel")
 
     type = Column(String(length=64), index=True, nullable=False)

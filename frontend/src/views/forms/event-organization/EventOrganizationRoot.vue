@@ -1,7 +1,7 @@
 <template>
   <FormRoot
       id="event-organization"
-      name="Organization of Events"
+      name="Organisation of Events"
   >
   </FormRoot>
 </template>

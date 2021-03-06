@@ -63,7 +63,7 @@ class JuryScientificCommitteeFormCreate(JuryScientificCommitteeFormBase):
 class AlchemyJuryScientificCommitteeFormModel(Base, AlchemyModel):
     __tablename__ = "form_jury_scientific_committee"
 
-    memberId = Column(GUID, ForeignKey("user.id"))
+    memberId = Column(GUID, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
     member = relationship("AlchemyUserModel", foreign_keys=[ memberId ])
 
     type = Column(String(length=64), index=True, nullable=False)

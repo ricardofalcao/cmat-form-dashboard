@@ -1,7 +1,7 @@
 <template>
   <FormRoot
       id="jury-sci-committee"
-      name="Jury Scientific Committee"
+      name="Jury / Scientific Committee"
   >
   </FormRoot>
 </template>

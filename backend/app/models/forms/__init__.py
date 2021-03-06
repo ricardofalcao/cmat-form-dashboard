@@ -18,7 +18,7 @@ class AlchemyModel:
 
     @declared_attr
     def userId(cls):
-        return Column(GUID, ForeignKey("user.id"))
+        return Column(GUID, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))
 
     @declared_attr
     def user(cls):

@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import JWTAuthentication
 from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users.password import get_password_hash
 
 from dbase import Base, engine, DATABASE_URL
 
@@ -33,7 +34,7 @@ auth_backends.append(jwt_authentication)
 #
 
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 raw_database = databases.Database(DATABASE_URL)
 fastapi_users = FastAPIUsers(

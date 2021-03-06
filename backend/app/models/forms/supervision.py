@@ -71,8 +71,8 @@ class SupervisionFormCreate(SupervisionFormBase):
 
 
 user_association_table: Table = Table('form_supervision_supervisors', Base.metadata,
-                               Column('supervisor_id', GUID, ForeignKey('user.id'), primary_key=True),
-                               Column('form_id', GUID, ForeignKey('form_supervision.id'), primary_key=True)
+                               Column('supervisor_id', GUID, ForeignKey('user.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True),
+                               Column('form_id', GUID, ForeignKey('form_supervision.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
                                )
 
 

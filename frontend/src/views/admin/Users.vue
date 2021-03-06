@@ -34,12 +34,28 @@
                 <v-text-field
                     v-model="editedItem.name"
                     :disabled="editPending"
-                    label="Name"
+                    label="Full Name"
                 ></v-text-field>
+                <v-text-field
+                    v-model="editedItem.shortName"
+                    :disabled="editPending"
+                    label="Short Name"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editedItem.authorName"
+                    :disabled="editPending"
+                    label="Author Name"
+                ></v-text-field>
+
                 <v-text-field
                     v-model="editedItem.email"
                     :disabled="editPending"
                     label="Email"
+                ></v-text-field>
+                <v-text-field
+                    v-model="editedItem.gmail"
+                    :disabled="editPending"
+                    label="Gmail"
                 ></v-text-field>
 
                 <v-select
@@ -48,8 +64,65 @@
                     :disabled="editPending"
                     label="Group"
                 ></v-select>
+
+                <v-select
+                    :items="[
+                        { text: 'MA', value: 'MA' },
+                        { text: 'MC', value: 'MC' },
+                        { text: 'MI', value: 'MI' },
+                        { text: 'PhD Student', value: 'STUDENT' },
+                        { text: 'Other', value: 'OTHER' },
+                    ]"
+                    v-model="editedItem.type"
+                    :disabled="editPending"
+                    label="Type"
+                ></v-select>
+
+                <v-select
+                    :items="[
+                        { text: 'Assistant Professor', value: 'ASSISTANT_PROFESSOR' },
+                        { text: 'Associate Professor', value: 'ASSOCIATE_PROFESSOR' },
+                        { text: 'Full Processor', value: 'FULL_PROFESSOR' },
+                        { text: 'Junior Researcher', value: 'JUNIOR_RESEARCHER' },
+                        { text: 'Postdoc Researcher', value: 'POSTDOC_RESEARCHER' },
+                        { text: 'Scholarship', value: 'SCHOLARSHIP' },
+                    ]"
+                    v-model="editedItem.position"
+                    :disabled="editPending"
+                    label="Position"
+                ></v-select>
+
                 <v-text-field
-                    v-if="formCreate"
+                    v-model="editedItem.institution"
+                    :disabled="editPending"
+                    label="Institution"
+                ></v-text-field>
+
+                <v-text-field
+                    v-model="editedItem.cienciaId"
+                    :disabled="editPending"
+                    label="Ciência ID"
+                ></v-text-field>
+
+                <v-text-field
+                    v-model="editedItem.orcidId"
+                    :disabled="editPending"
+                    label="Orcid ID"
+                ></v-text-field>
+
+                <v-text-field
+                    v-model="editedItem.scopusAuthorId"
+                    :disabled="editPending"
+                    label="Scopus Author ID"
+                ></v-text-field>
+
+                <v-text-field
+                    v-model="editedItem.researcherId"
+                    :disabled="editPending"
+                    label="Researcher ID"
+                ></v-text-field>
+
+                <v-text-field
                     v-model="editedItem.password"
                     :disabled="editPending"
                     type="password"
@@ -148,11 +221,29 @@
 export default {
   name: 'Users',
   data() {
+    const _defaultItem = {
+      name: '',
+      shortName: '',
+      authorName: '',
+      email: '',
+      gmail: '',
+      password: '',
+      group: '',
+      institution: '',
+      type: '',
+      position: '',
+      cienciaId: '',
+      orcidId: '',
+      scopusAuthorId: '',
+      researcherId: '',
+      is_superuser: false
+    }
+
     return {
       headers: [
         {text: 'Name', value: 'name'},
         {text: 'Group', value: 'group'},
-        {text: 'Email', value: 'email'},
+        {text: 'Institution', value: 'institution'},
         {text: 'Admin', value: 'is_superuser'},
       ],
 
@@ -161,20 +252,8 @@ export default {
       valid: false,
 
       editedIndex: -1,
-      editedItem: {
-        name: '',
-        email: '',
-        password: '',
-        group: '',
-        is_superuser: false
-      },
-      defaultItem: {
-        name: '',
-        email: '',
-        password: '',
-        group: '',
-        is_superuser: false
-      },
+      editedItem: Object.assign({}, _defaultItem),
+      defaultItem: _defaultItem,
 
       pending: true,
       editPending: false,
@@ -315,7 +394,9 @@ export default {
         requestOptions['method'] = 'PATCH';
 
         let body = Object.assign({}, this.editedItem);
-        delete body.password;
+        if (body.password && body.password.length == 0) {
+          delete body.password;
+        }
 
         requestOptions['body'] = JSON.stringify(body)
       }
