@@ -16,7 +16,7 @@ from routes.form import register_form_routes
 from routes.user import register_user_routes
 
 base_prefix = os.getenv("API_PREFIX", "/api")
-app = FastAPI(root_path=base_prefix, docs_url=None, redoc_url=None)
+app = FastAPI(root_path=base_prefix, docs_url="/docs", redoc_url="/redoc")
 
 #
 #
