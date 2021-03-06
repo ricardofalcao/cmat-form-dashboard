@@ -75,7 +75,7 @@
                 entries: [],
             }
         },
-        mounted() {
+        async mounted() {
             let members = []
 
             for (let i = 0; i < this.members.length; i++) {

@@ -207,23 +207,25 @@
                                         label="Extension"
                                 ></v-select>
 
-                                <v-list v-if="schemaVars.length > 0" dense>
-                                    <v-subheader>VARIABLES</v-subheader>
+                                <template v-if="schemaVars.length > 0">
+                                    <v-list dense>
+                                        <v-subheader>VARIABLES (More information <a target="_blank" href="https://handlebarsjs.com/guide/builtin-helpers.html" class="ml-1">here</a>) </v-subheader>
 
-                                    <v-flex>
-                                        <v-row>
-                                            <v-col v-for="(svar, index) in schemaVars" :key="index">
-                                                <v-list-item>
-                                                    <v-list-item-content>
-                                                        <v-list-item-title>{{ svar.title }}</v-list-item-title>
-                                                        <v-list-item-subtitle>{{ svar.description }}
-                                                        </v-list-item-subtitle>
-                                                    </v-list-item-content>
-                                                </v-list-item>
-                                            </v-col>
-                                        </v-row>
-                                    </v-flex>
-                                </v-list>
+                                        <v-flex>
+                                            <v-row>
+                                                <v-col v-for="(svar, index) in schemaVars" :key="index">
+                                                    <v-list-item>
+                                                        <v-list-item-content>
+                                                            <v-list-item-title>{{ svar.title }}</v-list-item-title>
+                                                            <v-list-item-subtitle>{{ svar.description }}
+                                                            </v-list-item-subtitle>
+                                                        </v-list-item-content>
+                                                    </v-list-item>
+                                                </v-col>
+                                            </v-row>
+                                        </v-flex>
+                                    </v-list>
+                                </template>
                             </v-form>
                         </v-card-text>
 
@@ -434,7 +436,7 @@
                 return this.schemaIndex < 0 ? 'Create schema' : 'Edit schema'
             }
         },
-        mounted() {
+        async mounted() {
             this.fetchSchemas();
             this.fetchLogs();
         },

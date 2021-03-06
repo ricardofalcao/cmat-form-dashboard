@@ -184,7 +184,7 @@ export default {
       dialogDelete: false,
     }
   },
-  mounted() {
+  async mounted() {
     this.fetchUsers();
   },
   watch: {
