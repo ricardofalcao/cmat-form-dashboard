@@ -77,6 +77,11 @@ const pages = [
                 path: 'jury-sci-committee',
                 name: 'Jury Scientific Committee',
                 component: () => import('../components/logs/LogJurySciCommittee.vue'),
+            },
+            {
+                path: 'referring-editorial-act',
+                name: 'Refereeing Editorial Act',
+                component: () => import('../components/logs/LogReferringEditorialAct.vue'),
             }
         ]
     },
@@ -192,6 +197,27 @@ const pages = [
                 path: 'history',
                 name: 'History',
                 component: () => import('../views/forms/jury-sci-committee/JurySciCommitteeHistory.vue'),
+            }
+        ]
+    },
+    {
+        path: '/forms/referring-editorial-act',
+        name: 'Refereeing Editorial Act',
+        meta: {
+            sidebar: true,
+            requiresAuth: true
+        },
+        component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActRoot.vue'),
+        children: [
+            {
+                path: '',
+                name: 'Form',
+                component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActForm.vue'),
+            },
+            {
+                path: 'history',
+                name: 'History',
+                component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActHistory.vue'),
             }
         ]
     }
