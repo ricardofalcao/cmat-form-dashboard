@@ -26,7 +26,7 @@ app = FastAPI(root_path=base_prefix, docs_url="/docs", redoc_url="/redoc")
 JWT_SECRET = "M5Y8Q^uFD8Exs%h7"
 
 auth_backends = []
-jwt_authentication = JWTAuthentication(secret=JWT_SECRET, lifetime_seconds=12 * 60 * 60)
+jwt_authentication = JWTAuthentication(secret=JWT_SECRET, lifetime_seconds=12 * 60 * 60, tokenUrl='/auth/jwt/login')
 auth_backends.append(jwt_authentication)
 
 #
