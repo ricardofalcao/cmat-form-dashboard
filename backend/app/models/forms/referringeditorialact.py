@@ -6,7 +6,7 @@ from pydantic import UUID4, validator
 from sqlalchemy import Column, String, Text, DateTime, func, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from dbase import Base
+from db import Base
 from models.forms import Form, AlchemyModel
 from models.user import User
 

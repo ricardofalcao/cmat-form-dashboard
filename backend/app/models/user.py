@@ -6,7 +6,7 @@ from fastapi_users.db import SQLAlchemyBaseUserTable
 from pydantic import EmailStr
 from sqlalchemy import Column, String, Enum
 
-from dbase import Base
+from db import Base
 
 
 class UserGroup(str, enum.Enum):
