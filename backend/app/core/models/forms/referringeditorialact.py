@@ -1,14 +1,14 @@
 import uuid
 from typing import Optional
 
-from fastapi_users.db.sqlalchemy import GUID
 from pydantic import UUID4, validator
 from sqlalchemy import Column, String, Text, DateTime, func, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from db import Base
-from models.forms import Form, AlchemyModel
-from models.user import User
+from core.models.forms.base import Form, AlchemyFormModel
+from core.models import User
+from core.utils import GUID
 
 
 #
@@ -53,7 +53,7 @@ class ReferringEditorialActFormCreate(ReferringEditorialActFormBase):
         return {**this_dict, 'memberId': self.member}
 
 
-class AlchemyReferringEditorialActFormModel(Base, AlchemyModel):
+class AlchemyReferringEditorialActFormModel(Base, AlchemyFormModel):
     __tablename__ = "form_referring_editorial_act"
 
     memberId = Column(GUID, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))

@@ -6,8 +6,8 @@ from pydantic import UUID4, validator
 from sqlalchemy import Column, String, Date, Text, DateTime, func
 
 from db import Base
-from models.forms import Form, AlchemyModel
-from models.user import User
+from core.models.forms.base import Form, AlchemyFormModel
+from core.models import User
 
 
 #
@@ -58,7 +58,7 @@ class EventParticipationFormCreate(EventParticipationFormBase):
         return {**this_dict, 'dateStart': self.date[0], 'dateFinish': self.date[1]}
 
 
-class AlchemyEventParticipationFormModel(Base, AlchemyModel):
+class AlchemyEventParticipationFormModel(Base, AlchemyFormModel):
     __tablename__ = "form_event_participation"
 
     eventType = Column(String(length=64), index=True, nullable=False)

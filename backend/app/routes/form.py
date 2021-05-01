@@ -2,14 +2,14 @@ from typing import TypeVar, Generic
 
 import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi_users import FastAPIUsers
 from pydantic.generics import GenericModel
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from starlette import status
 
+from core import controllers
 from db import get_database
-from models import *
+from core.models import *
 
 DataT = TypeVar('DataT')
 
@@ -19,17 +19,18 @@ class FormList(GenericModel, Generic[DataT]):
     total: Optional[int]
 
 
-def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
+def register_form_routes(router: APIRouter):
     forms_router = APIRouter()
 
     __register_form_routes(
-        forms_router,
-        fastapi_users,
-        'event-participation',
-        'Participation in Events',
-        EventParticipationForm,
-        EventParticipationFormCreate,
-        AlchemyEventParticipationFormModel,
+        router=forms_router,
+        form_internal_name='event-participation',
+        form_pretty_name='Participation in Events',
+        form_operation_name='FormEventParticipation',
+        form_abbreviation_name='EP',
+        form_model=EventParticipationForm,
+        form_create_model=EventParticipationFormCreate,
+        form_db_model=AlchemyEventParticipationFormModel,
         allowed_sorts=[
             'user',
             'group',
@@ -52,13 +53,14 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
     )
 
     __register_form_routes(
-        forms_router,
-        fastapi_users,
-        'event-organization',
-        'Organization of Events',
-        EventOrganizationForm,
-        EventOrganizationFormCreate,
-        AlchemyEventOrganizationFormModel,
+        router=forms_router,
+        form_internal_name='event-organization',
+        form_pretty_name='Organization of Events',
+        form_operation_name='FormEventOrganization',
+        form_abbreviation_name='EO',
+        form_model=EventOrganizationForm,
+        form_create_model=EventOrganizationFormCreate,
+        form_db_model=AlchemyEventOrganizationFormModel,
         allowed_sorts=[
             'user',
             'eventType',
@@ -77,13 +79,14 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
     )
 
     __register_form_routes(
-        forms_router,
-        fastapi_users,
-        'extension',
-        'Extension',
-        ExtensionForm,
-        ExtensionFormCreate,
-        AlchemyExtensionFormModel,
+        router=forms_router,
+        form_internal_name='extension',
+        form_pretty_name='Extension',
+        form_operation_name='FormExtension',
+        form_abbreviation_name='E',
+        form_model=ExtensionForm,
+        form_create_model=ExtensionFormCreate,
+        form_db_model=AlchemyExtensionFormModel,
         allowed_sorts=[
             'user',
             'type',
@@ -96,13 +99,14 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
     )
 
     __register_form_routes(
-        forms_router,
-        fastapi_users,
-        'supervision',
-        'Supervision',
-        SupervisionForm,
-        SupervisionFormCreate,
-        AlchemySupervisionFormModel,
+        router=forms_router,
+        form_internal_name='supervision',
+        form_pretty_name='Supervision',
+        form_operation_name='FormSupervision',
+        form_abbreviation_name='S',
+        form_model=SupervisionForm,
+        form_create_model=SupervisionFormCreate,
+        form_db_model=AlchemySupervisionFormModel,
         allowed_sorts=[
             'user',
             'student',
@@ -128,13 +132,14 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
     )
 
     __register_form_routes(
-        forms_router,
-        fastapi_users,
-        'jury-sci-committee',
-        'Jury Scientific Committee',
-        JuryScientificCommitteeForm,
-        JuryScientificCommitteeFormCreate,
-        AlchemyJuryScientificCommitteeFormModel,
+        router=forms_router,
+        form_internal_name='jury-sci-committee',
+        form_pretty_name='Jury Scientific Committee',
+        form_operation_name='FormJuryScientificCommitee',
+        form_abbreviation_name='JSC',
+        form_model=JuryScientificCommitteeForm,
+        form_create_model=JuryScientificCommitteeFormCreate,
+        form_db_model=AlchemyJuryScientificCommitteeFormModel,
         allowed_sorts=[
             'user',
             'type',
@@ -147,13 +152,14 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
     )
 
     __register_form_routes(
-        forms_router,
-        fastapi_users,
-        'referring-editorial-act',
-        'Refereeing Editorial Act',
-        ReferringEditorialActForm,
-        ReferringEditorialActFormCreate,
-        AlchemyReferringEditorialActFormModel,
+        router=forms_router,
+        form_internal_name='referring-editorial-act',
+        form_pretty_name='Refereeing Editorial Act',
+        form_operation_name='FormRefereeingEditorialAct',
+        form_abbreviation_name='REA',
+        form_model=ReferringEditorialActForm,
+        form_create_model=ReferringEditorialActFormCreate,
+        form_db_model=AlchemyReferringEditorialActFormModel,
         allowed_sorts=[
             'user',
             'type',
@@ -178,24 +184,29 @@ def register_form_routes(router: APIRouter, fastapi_users: FastAPIUsers):
 
 def __register_form_routes(
         router: APIRouter,
-        fastapi_users: FastAPIUsers,
-        form_name: str,
+        form_internal_name: str,
         form_pretty_name: str,
+        form_operation_name: str,
+        form_abbreviation_name: str,
         form_model: Form,
         form_create_model: Form,
-        form_db_model: AlchemyModel,
+        form_db_model: AlchemyFormModel,
         allowed_sorts: List[str] = [],
         search_fields: List[str] = []
 ):
-    @router.post(f"/{form_name}",
-                 response_model=form_model,
-                 status_code=status.HTTP_201_CREATED,
-                 summary=f'Create "{form_pretty_name}" form',
-                 description=f'Create new "{form_pretty_name}" form',
-                 response_description="The created form")
+    @router.post(
+        f"/{form_internal_name}",
+        response_model=form_model,
+        tags=[form_operation_name],
+        status_code=status.HTTP_201_CREATED,
+        summary=f'Create "{form_pretty_name}" form',
+        operation_id=f'create{form_abbreviation_name}',
+        description=f'Create new "{form_pretty_name}" form',
+        response_description="The created form"
+    )
     async def formCreate(
             form: form_create_model,
-            user: User = Depends(fastapi_users.current_user()),
+            user: User = Depends(controllers.user.get_current_user),
             db: Session = Depends(get_database)
     ):
 
@@ -212,14 +223,18 @@ def __register_form_routes(
 
         return created_form
 
-    @router.get(f"/{form_name}/{{id:uuid}}",
-                response_model=form_model,
-                summary=f'Get "{form_pretty_name}" form',
-                description=f'Get "{form_pretty_name}" form by id',
-                response_description="The requested form")
+    @router.get(
+        f"/{form_internal_name}/{{id:uuid}}",
+        response_model=form_model,
+        tags=[form_operation_name],
+        summary=f'Get "{form_pretty_name}" form',
+        operation_id=f'get{form_abbreviation_name}',
+        description=f'Get "{form_pretty_name}" form by id',
+        response_description="The requested form"
+    )
     async def formGet(
             id: UUID4,
-            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            user: User = Depends(controllers.user.get_current_superuser),
             db: Session = Depends(get_database)
     ):
         db_form = db.query(form_db_model).filter(form_db_model.id == id).first()
@@ -228,15 +243,19 @@ def __register_form_routes(
 
         return db_form
 
-    @router.patch(f"/{form_name}/{{id:uuid}}",
-                  response_model=form_model,
-                  summary=f'Update "{form_pretty_name}" form',
-                  description=f'Update "{form_pretty_name}" form by id',
-                  response_description="The updated form")
+    @router.patch(
+        f"/{form_internal_name}/{{id:uuid}}",
+        response_model=form_model,
+        tags=[form_operation_name],
+        summary=f'Update "{form_pretty_name}" form',
+        operation_id=f'update{form_abbreviation_name}',
+        description=f'Update "{form_pretty_name}" form by id',
+        response_description="The updated form"
+    )
     async def formUpdate(
             id: UUID4,
             form: form_create_model,
-            user: User = Depends(fastapi_users.current_user()),
+            user: User = Depends(controllers.user.get_current_user),
             db: Session = Depends(get_database)
     ):
         db_form = db.query(form_db_model).filter(form_db_model.id == id).first()
@@ -257,13 +276,17 @@ def __register_form_routes(
 
         return db_form
 
-    @router.delete(f"/{form_name}/{{id:uuid}}",
-                   status_code=status.HTTP_204_NO_CONTENT,
-                   summary=f'Delete "{form_pretty_name}" form',
-                   description=f'Delete "{form_pretty_name}" form by id')
+    @router.delete(
+        f"/{form_internal_name}/{{id:uuid}}",
+        tags=[form_operation_name],
+        status_code=status.HTTP_204_NO_CONTENT,
+        summary=f'Delete "{form_pretty_name}" form',
+        operation_id=f'delete{form_abbreviation_name}',
+        description=f'Delete "{form_pretty_name}" form by id'
+    )
     async def formDelete(
             id: UUID4,
-            user: User = Depends(fastapi_users.current_user()),
+            user: User = Depends(controllers.user.get_current_user),
             db: Session = Depends(get_database)
     ):
         db_form = db.query(form_db_model).filter(form_db_model.id == id).first()
@@ -345,11 +368,15 @@ def __register_form_routes(
 
         return FormList[form_model](forms=forms, total=total)
 
-    @router.get(f"/{form_name}/list/me",
-                response_model=FormList[form_model],
-                summary=f'Me "{form_pretty_name}" forms',
-                description=f'Get the current user "{form_pretty_name}" forms',
-                response_description="The user forms")
+    @router.get(
+        f"/{form_internal_name}/list/me",
+        response_model=FormList[form_model],
+        tags=[form_operation_name],
+        summary=f'Me "{form_pretty_name}" forms',
+        operation_id=f'getAll{form_abbreviation_name}Me',
+        description=f'Get the current user "{form_pretty_name}" forms',
+        response_description="The user forms"
+    )
     async def formListMe(
             size: int,
             page: int,
@@ -358,7 +385,7 @@ def __register_form_routes(
             sort: Optional[str] = None,
             desc: Optional[str] = None,
             q: Optional[str] = Query(None, min_length=3),
-            user: User = Depends(fastapi_users.current_user()),
+            user: User = Depends(controllers.user.get_current_user),
             db: Session = Depends(get_database),
     ):
         query = db.query(form_db_model, func.count(form_db_model.id).over().label('total')).filter(
@@ -375,11 +402,15 @@ def __register_form_routes(
             q
         )
 
-    @router.get(f"/{form_name}/list",
-                response_model=FormList[form_model],
-                summary=f'Get all "{form_pretty_name}" forms',
-                description=f'Get all the "{form_pretty_name}" forms',
-                response_description="The requested forms")
+    @router.get(
+        f"/{form_internal_name}/list",
+        response_model=FormList[form_model],
+        tags=[form_operation_name],
+        summary=f'Get all "{form_pretty_name}" forms',
+        operation_id=f'getAll{form_abbreviation_name}',
+        description=f'Get all the "{form_pretty_name}" forms',
+        response_description="The requested forms"
+    )
     async def formList(
             size: int,
             page: int,
@@ -388,7 +419,7 @@ def __register_form_routes(
             sort: Optional[str] = None,
             desc: Optional[str] = None,
             q: Optional[str] = Query(None, min_length=3),
-            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            user: User = Depends(controllers.user.get_current_superuser),
             db: Session = Depends(get_database),
     ):
         query = db.query(form_db_model, func.count(form_db_model.id).over().label('total'))
@@ -404,21 +435,25 @@ def __register_form_routes(
             q
         )
 
-    @router.post(f"/{form_name}/exports",
-                 response_model=ExportSchema,
-                 summary=f'Create "{form_pretty_name}" form schema',
-                 description=f'Create a new "{form_pretty_name}" form schema',
-                 response_description="The created schema")
+    @router.post(
+        f"/{form_internal_name}/exports",
+        response_model=ExportSchema,
+        tags=[f'{form_operation_name}Schemas'],
+        summary=f'Create "{form_pretty_name}" form schema',
+        operation_id=f'create{form_abbreviation_name}Schema',
+        description=f'Create a new "{form_pretty_name}" form schema',
+        response_description="The created schema"
+    )
     async def exportsCreate(
             export: ExportSchemaCreate,
-            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            user: User = Depends(controllers.user.get_current_superuser),
             db: Session = Depends(get_database)
     ):
 
         created_export = AlchemyExportSchemaModel(
             **export.create_dict(),
             userId=user.id,
-            type=form_name
+            type=form_internal_name
         )
 
         db.add(created_export)
@@ -427,15 +462,19 @@ def __register_form_routes(
 
         return created_export
 
-    @router.patch(f"/{form_name}/exports/{{id:uuid}}",
-                  response_model=ExportSchema,
-                  summary=f'Update "{form_pretty_name}" form schema',
-                  description=f'Update a "{form_pretty_name}" form schema by id',
-                  response_description="The updated schema")
+    @router.patch(
+        f"/{form_internal_name}/exports/{{id:uuid}}",
+        response_model=ExportSchema,
+        tags=[f'{form_operation_name}Schemas'],
+        summary=f'Update "{form_pretty_name}" form schema',
+        operation_id=f'update{form_abbreviation_name}Schema',
+        description=f'Update a "{form_pretty_name}" form schema by id',
+        response_description="The updated schema"
+    )
     async def exportsUpdate(
             id: UUID4,
             export: ExportSchemaCreate,
-            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            user: User = Depends(controllers.user.get_current_superuser),
             db: Session = Depends(get_database)
     ):
 
@@ -451,13 +490,17 @@ def __register_form_routes(
 
         return schema
 
-    @router.delete(f"/{form_name}/exports/{{id:uuid}}",
-                   status_code=status.HTTP_204_NO_CONTENT,
-                   summary=f'Delete "{form_pretty_name}" form schema',
-                   description=f'Delete a "{form_pretty_name}" form schema by id')
+    @router.delete(
+        f"/{form_internal_name}/exports/{{id:uuid}}",
+        tags=[f'{form_operation_name}Schemas'],
+        status_code=status.HTTP_204_NO_CONTENT,
+        summary=f'Delete "{form_pretty_name}" form schema',
+        operation_id=f'delete{form_abbreviation_name}Schema',
+        description=f'Delete a "{form_pretty_name}" form schema by id'
+    )
     async def exportsDelete(
             id: UUID4,
-            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            user: User = Depends(controllers.user.get_current_superuser),
             db: Session = Depends(get_database)
     ):
 
@@ -470,15 +513,19 @@ def __register_form_routes(
 
         return schema
 
-    @router.get(f"/{form_name}/exports/list",
-                response_model=ExportSchemaList,
-                summary=f'Get all "{form_pretty_name}" form schemas',
-                description=f'Get all "{form_pretty_name}" form schemas',
-                response_description="The requested schemas")
+    @router.get(
+        f"/{form_internal_name}/exports/list",
+        response_model=ExportSchemaList,
+        tags=[f'{form_operation_name}Schemas'],
+        summary=f'Get all "{form_pretty_name}" form schemas',
+        operation_id=f'getAll{form_abbreviation_name}Schemas',
+        description=f'Get all "{form_pretty_name}" form schemas',
+        response_description="The requested schemas"
+    )
     async def exportsList(
-            user: User = Depends(fastapi_users.current_user(superuser=True)),
+            user: User = Depends(controllers.user.get_current_superuser),
             db: Session = Depends(get_database)
     ):
 
-        schemas = db.query(AlchemyExportSchemaModel).filter(AlchemyExportSchemaModel.type == form_name).all()
+        schemas = db.query(AlchemyExportSchemaModel).filter(AlchemyExportSchemaModel.type == form_internal_name).all()
         return ExportSchemaList(schemas=schemas)

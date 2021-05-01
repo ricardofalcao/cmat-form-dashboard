@@ -22,9 +22,6 @@ services:
       - .env
     ports:
       - 8000:80
-    environment:
-      - SERVER_NAME=${DOMAIN?Variable not set}
-      - SERVER_HOST=https://${DOMAIN?Variable not set}
     build:
       context: ./backend
       dockerfile: Backend.dockerfile

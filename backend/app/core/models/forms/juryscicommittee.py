@@ -2,14 +2,14 @@ import uuid
 from datetime import date
 from typing import Optional, List
 
-from fastapi_users.db.sqlalchemy import GUID
 from pydantic import UUID4, validator
-from sqlalchemy import Column, String, Date, Text, DateTime, func, ForeignKey, Table
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy import Column, String, Date, Text, DateTime, func, ForeignKey
+from sqlalchemy.orm import relationship
 
 from db import Base
-from models.forms import Form, AlchemyModel
-from models.user import User
+from core.models.forms.base import Form, AlchemyFormModel
+from core.models import User
+from core.utils import GUID
 
 
 #
@@ -60,7 +60,7 @@ class JuryScientificCommitteeFormCreate(JuryScientificCommitteeFormBase):
         return {**this_dict, 'dateStart': self.date[0], 'dateFinish': self.date[1], 'memberId': self.member}
 
 
-class AlchemyJuryScientificCommitteeFormModel(Base, AlchemyModel):
+class AlchemyJuryScientificCommitteeFormModel(Base, AlchemyFormModel):
     __tablename__ = "form_jury_scientific_committee"
 
     memberId = Column(GUID, ForeignKey("user.id", ondelete="CASCADE", onupdate="CASCADE"))

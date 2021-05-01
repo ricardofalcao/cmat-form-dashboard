@@ -1,26 +1,39 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import JWTAuthentication
-from fastapi_users.router.common import ErrorCode
+from sqlalchemy.orm import Session
+
+from core import controllers
+from core.models.auth import AuthResponse
+from core.utils import jwt
+from db import get_database
 
 
-def register_auth_routes(router: APIRouter, fastapi_users: FastAPIUsers, jwt_authentication: JWTAuthentication):
-    auth_router = APIRouter();
+def register_auth_routes(router: APIRouter):
+    auth_router = APIRouter()
 
-    @auth_router.post("/login")
+    @auth_router.post(
+        "/login",
+        response_model=AuthResponse,
+        tags=['Auth'],
+        summary='Login',
+        operation_id='login',
+        description='Login with a username and password',
+        response_description="The generated access token"
+    )
     async def login(
-            response: Response, credentials: OAuth2PasswordRequestForm = Depends()
+            credentials: OAuth2PasswordRequestForm = Depends(),
+            db: Session = Depends(get_database)
     ):
-        user = await fastapi_users.db.authenticate(credentials)
+        user = await controllers.user.authenticate_user(db, credentials)
 
-        if user is None or not user.is_active:
+        if user is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=ErrorCode.LOGIN_BAD_CREDENTIALS,
+                detail="Bad credentials",
             )
 
-        return await jwt_authentication.get_login_response(user, response)
+        token = jwt.generate_token(user.id)
+        return AuthResponse(access_token=token, token_type="bearer")
 
     router.include_router(
         auth_router,

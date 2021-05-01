@@ -2,28 +2,24 @@ import uuid
 from datetime import date
 from typing import Optional, List
 
-from fastapi_users.db.sqlalchemy import GUID
 from pydantic import UUID4, validator
 from sqlalchemy import Column, String, Date, Text, DateTime, func, ForeignKey, Table
 from sqlalchemy.orm import relationship, Session
 
 from db import Base
-from models.forms import Form, AlchemyModel
-from models.user import User
+from core.models.forms.base import Form, AlchemyFormModel
+from core.models import User
+from core.utils import GUID
 
 
 #
 #
 #
 
-class EventOrganizationFormBase(Form):
+class ExtensionFormBase(Form):
     id: Optional[UUID4] = None
-    eventType: str
-    involvementType: str
-    regionType: str
-    designation: str
-    local: str
-    url: str
+    type: str
+    description: str
     observations: Optional[str] = None
 
     @validator("id", pre=True, always=True)
@@ -31,7 +27,7 @@ class EventOrganizationFormBase(Form):
         return v or uuid.uuid4()
 
 
-class EventOrganizationForm(EventOrganizationFormBase):
+class ExtensionForm(ExtensionFormBase):
     user: User
     members: List[User]
     dateStart: date
@@ -41,7 +37,7 @@ class EventOrganizationForm(EventOrganizationFormBase):
         orm_mode = True
 
 
-class EventOrganizationFormCreate(EventOrganizationFormBase):
+class ExtensionFormCreate(ExtensionFormBase):
     date: List[date]
     members: List[UUID4]
 
@@ -69,33 +65,29 @@ class EventOrganizationFormCreate(EventOrganizationFormBase):
         return {**this_dict, 'dateStart': self.date[0], 'dateFinish': self.date[1]}
 
 
-user_association_table: Table = Table('form_event_organization_members', Base.metadata,
+user_association_table: Table = Table('form_extension_members', Base.metadata,
                                Column('member_id', GUID, ForeignKey('user.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True),
-                               Column('form_id', GUID, ForeignKey('form_event_organization.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
+                               Column('form_id', GUID, ForeignKey('form_extension.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
                                )
 
 
-class AlchemyEventOrganizationFormModel(Base, AlchemyModel):
-    __tablename__ = "form_event_organization"
+class AlchemyExtensionFormModel(Base, AlchemyFormModel):
+    __tablename__ = "form_extension"
 
     members = relationship("AlchemyUserModel", secondary=user_association_table)
 
-    eventType = Column(String(length=64), index=True, nullable=False)
-    involvementType = Column(String(length=64), index=True, nullable=False)
-    regionType = Column(String(length=64), index=True, nullable=False)
-    designation = Column(String(length=64), index=True, nullable=False)
-    local = Column(String(length=64), index=True, nullable=False)
+    type = Column(String(length=64), index=True, nullable=False)
+    description = Column(Text, nullable=False)
 
     dateStart = Column(Date, index=True, nullable=False)
     dateFinish = Column(Date, index=True, nullable=False)
 
-    url = Column(Text, nullable=False)
     observations = Column(Text, nullable=True)
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
-    def postUpdate(self, db: Session, create_model: EventOrganizationFormCreate):
+    def postUpdate(self, db: Session, create_model: ExtensionFormCreate):
         this_members_ids = map(lambda m: m.id, self.members)
 
         for member in create_model.members:
@@ -107,7 +99,7 @@ class AlchemyEventOrganizationFormModel(Base, AlchemyModel):
         db.commit()
         db.refresh(self)
 
-    def postInsert(self, db: Session, create_model: EventOrganizationFormCreate):
+    def postInsert(self, db: Session, create_model: ExtensionFormCreate):
         for member in create_model.members:
             db.execute(user_association_table.insert(), params={'member_id': member, 'form_id': self.id})
 

@@ -2,14 +2,14 @@ import uuid
 from datetime import date
 from typing import Optional, List
 
-from fastapi_users.db.sqlalchemy import GUID
 from pydantic import UUID4, validator
 from sqlalchemy import Column, String, Date, Text, DateTime, func, ForeignKey, Table
 from sqlalchemy.orm import relationship, Session
 
 from db import Base
-from models.forms import Form, AlchemyModel
-from models.user import User
+from core.models.forms.base import Form, AlchemyFormModel
+from core.models import User
+from core.utils import GUID
 
 
 #
@@ -71,12 +71,16 @@ class SupervisionFormCreate(SupervisionFormBase):
 
 
 user_association_table: Table = Table('form_supervision_supervisors', Base.metadata,
-                               Column('supervisor_id', GUID, ForeignKey('user.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True),
-                               Column('form_id', GUID, ForeignKey('form_supervision.id', ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
-                               )
+                                      Column('supervisor_id', GUID,
+                                             ForeignKey('user.id', ondelete="CASCADE", onupdate="CASCADE"),
+                                             primary_key=True),
+                                      Column('form_id', GUID,
+                                             ForeignKey('form_supervision.id', ondelete="CASCADE", onupdate="CASCADE"),
+                                             primary_key=True)
+                                      )
 
 
-class AlchemySupervisionFormModel(Base, AlchemyModel):
+class AlchemySupervisionFormModel(Base, AlchemyFormModel):
     __tablename__ = "form_supervision"
 
     supervisors = relationship("AlchemyUserModel", secondary=user_association_table)

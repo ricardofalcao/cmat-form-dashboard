@@ -1,8 +1,9 @@
-from fastapi_users.db.sqlalchemy import GUID
 from pydantic import BaseModel
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, Session
+
+from core.utils import GUID
 
 
 class Form(BaseModel):
@@ -13,7 +14,7 @@ class Form(BaseModel):
         pass
 
 
-class AlchemyModel:
+class AlchemyFormModel:
     id = Column(GUID, primary_key=True)
 
     @declared_attr
@@ -22,7 +23,7 @@ class AlchemyModel:
 
     @declared_attr
     def user(cls):
-        return relationship("AlchemyUserModel", foreign_keys = [ cls.userId ])
+        return relationship("AlchemyUserModel", foreign_keys=[cls.userId])
 
     def postInsert(self, db: Session, create_model):
         pass

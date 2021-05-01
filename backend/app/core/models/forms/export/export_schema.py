@@ -1,18 +1,19 @@
 import uuid
 from typing import Optional, List
 
-from fastapi_users.db.sqlalchemy import GUID
 from pydantic import UUID4, validator, BaseModel
 from sqlalchemy import Column, String, Text, DateTime, func, ForeignKey
 from sqlalchemy.orm import relationship
 
 from db import Base
-from models import User
+from core.models import User
+from core.utils import GUID
 
 
 #
 #
 #
+
 
 class ExportSchemaBase(BaseModel):
     id: Optional[UUID4] = None
@@ -24,12 +25,14 @@ class ExportSchemaBase(BaseModel):
     def default_id(cls, v):
         return v or uuid.uuid4()
 
+
 class ExportSchema(ExportSchemaBase):
     user: User
     type: str
 
     class Config:
         orm_mode = True
+
 
 class ExportSchemaList(BaseModel):
     schemas: List[ExportSchema]
