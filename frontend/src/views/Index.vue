@@ -7,7 +7,7 @@
       <v-card-text class="mt-4 headline">
 
         Welcome to the CMAT Indicators dashboard. <br/>
-        Please fill all the forms in english.
+        Please fill the forms in english only!
       </v-card-text>
     </v-card>
   </div>

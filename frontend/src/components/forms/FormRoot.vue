@@ -1,5 +1,5 @@
 <template>
-    <div :class="`log-${id}`" class="pa-4">
+    <div :class="`log-${id}`" class="pa-10">
         <v-card elevation="2">
             <v-card-title class="mt-4 text-center justify-center py-2">
                 <h4 class="text-h4">{{ name }}</h4>

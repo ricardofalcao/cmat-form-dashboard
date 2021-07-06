@@ -46,7 +46,7 @@
         </v-list>
 
         <template #append>
-          <v-img class="d-none d-sm-block" src="/images/CMAT-logo-blue.png"></v-img>
+          <v-img class="d-none d-md-block ma-auto mb-3" width="70%" max-width="200px" src="/images/CMAT-logo-blue.png"></v-img>
         </template>
       </v-navigation-drawer>
 
@@ -58,7 +58,7 @@
         <v-spacer></v-spacer>
 
         <div>
-          Logged in as <span>{{ getUser.name }}</span>
+          Logged in as <span>{{ getUser.shortName }}</span>
         </div>
 
         <v-btn to="/preferences" icon>

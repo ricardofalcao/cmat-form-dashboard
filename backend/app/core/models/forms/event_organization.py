@@ -3,7 +3,7 @@ from datetime import date
 from typing import Optional, List
 
 from pydantic import UUID4, validator
-from sqlalchemy import Column, String, Date, Text, DateTime, func, ForeignKey, Table
+from sqlalchemy import Column, String, Date, Text, DateTime, func, ForeignKey, Table, Integer
 from sqlalchemy.orm import relationship, Session
 
 from db import Base
@@ -22,6 +22,7 @@ class EventOrganizationFormBase(Form):
     involvementType: str
     regionType: str
     designation: str
+    participants: int
     local: str
     url: str
     observations: Optional[str] = None
@@ -88,6 +89,7 @@ class AlchemyEventOrganizationFormModel(Base, AlchemyFormModel):
     involvementType = Column(String(length=64), index=True, nullable=False)
     regionType = Column(String(length=64), index=True, nullable=False)
     designation = Column(String(length=64), index=True, nullable=False)
+    participants = Column(Integer, index=True, nullable=False)
     local = Column(String(length=64), index=True, nullable=False)
 
     dateStart = Column(Date, index=True, nullable=False)

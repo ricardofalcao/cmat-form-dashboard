@@ -78,6 +78,7 @@
                     eventType: '',
                     involvementType: '',
                     designation: '',
+                    participants: 0,
                     local: '',
                     date: [],
                     url: '',

@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from core import controllers
+from core import controllers, utils
 from core.models.auth import AuthResponse
-from core.utils import jwt
 from db import get_database
 
 
@@ -32,7 +31,7 @@ def register_auth_routes(router: APIRouter):
                 detail="Bad credentials",
             )
 
-        token = jwt.generate_token(user.id)
+        token = utils.generate_token(user.id)
         return AuthResponse(access_token=token, token_type="bearer")
 
     router.include_router(

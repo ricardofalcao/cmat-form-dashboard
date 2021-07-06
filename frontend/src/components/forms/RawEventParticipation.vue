@@ -58,6 +58,9 @@
         >
             <template v-slot:activator="{ on, attrs }">
                 <v-text-field
+                        :rules="[
+                            v => form.date.length == 2 ? true : form.date.length == 1 ? 'Finish date is required' : 'Start and finish date are required',
+                        ]"
                         :value="formatDate"
                         label="Date"
                         readonly

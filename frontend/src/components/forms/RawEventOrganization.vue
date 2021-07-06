@@ -37,7 +37,7 @@
         ></v-select>
 
         <v-select
-                :items="['Organizer', 'Local Organizer', 'Other']"
+                :items="['Organiser', 'Local Organiser', 'Scientific Committee', 'Other']"
                 v-model="form.involvementType"
 
                 :rules="[
@@ -59,6 +59,17 @@
         ></v-text-field>
 
         <v-text-field
+                v-model="form.participants"
+                type="number" min="0"
+                :rules="[
+                                        v => !!v || 'Participants is required',
+                                    ]"
+                required
+
+                label="Participants"
+        ></v-text-field>
+
+        <v-text-field
                 v-model="form.local"
                 :rules="[
                                         v => !!v || 'Local is required',
@@ -76,6 +87,9 @@
         >
             <template v-slot:activator="{ on, attrs }">
                 <v-text-field
+                        :rules="[
+                            v => form.date.length == 2 ? true : form.date.length == 1 ? 'Finish date is required' : 'Start and finish date are required',
+                        ]"
                         :value="formatDate"
                         label="Date"
                         readonly

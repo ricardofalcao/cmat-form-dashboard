@@ -28,6 +28,7 @@
                 involvementType: '',
                 regionType: '',
                 designation: '',
+                participants: 0,
                 local: '',
                 date: [],
                 url: '',

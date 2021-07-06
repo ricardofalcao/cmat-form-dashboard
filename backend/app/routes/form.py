@@ -66,6 +66,7 @@ def register_form_routes(router: APIRouter):
             'eventType',
             'involvementType',
             'designation',
+            'participants',
             'local',
             'dateStart'
         ],

@@ -7,7 +7,7 @@ from starlette import status
 from config import settings
 from db import get_database
 from core.models import UserDB, AlchemyUserModel, UserCreate, User
-from core.utils import password, jwt
+from core import utils
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_PREFIX}/auth/jwt/login")
 
@@ -16,7 +16,7 @@ async def get_current_user(
         db: Session = Depends(get_database),
         token: str = Depends(oauth2_scheme)
 ) -> User:
-    user_id = jwt.decode_token(token)
+    user_id = utils.decode_token(token)
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -80,10 +80,10 @@ async def authenticate_user(db: Session, credentials: OAuth2PasswordRequestForm)
     if user is None:
         # Run the hasher to mitigate timing attack
         # Inspired from Django: https://code.djangoproject.com/ticket/20760
-        password.get_password_hash(credentials.password)
+        utils.get_password_hash(credentials.password)
         return None
 
-    verified, updated_password_hash = password.verify_and_update_password(
+    verified, updated_password_hash = utils.verify_and_update_password(
         credentials.password, user.hashed_password
     )
     if not verified:

@@ -96,23 +96,44 @@ const pages = [
         component: () => import('../views/Index.vue')
     },
     {
-        path: '/forms/event-participation',
-        name: 'Participation in Events',
+        path: '/forms/extension',
+        name: 'Extension',
         meta: {
             sidebar: true,
             requiresAuth: true
         },
-        component: () => import('../views/forms/event-participation/EventParticipationRoot.vue'),
+        component: () => import('../views/forms/extension/ExtensionRoot.vue'),
         children: [
             {
                 path: '',
                 name: 'Form',
-                component: () => import('../views/forms/event-participation/EventParticipationForm.vue'),
+                component: () => import('../views/forms/extension/ExtensionForm.vue'),
             },
             {
                 path: 'history',
                 name: 'History',
-                component: () => import('../views/forms/event-participation/EventParticipationHistory.vue'),
+                component: () => import('../views/forms/extension/ExtensionHistory.vue'),
+            }
+        ]
+    },
+    {
+        path: '/forms/jury-sci-committee',
+        name: 'Jury & Scientific Committee',
+        meta: {
+            sidebar: true,
+            requiresAuth: true
+        },
+        component: () => import('../views/forms/jury-sci-committee/JurySciCommitteeRoot.vue'),
+        children: [
+            {
+                path: '',
+                name: 'Form',
+                component: () => import('../views/forms/jury-sci-committee/JurySciCommitteeForm.vue'),
+            },
+            {
+                path: 'history',
+                name: 'History',
+                component: () => import('../views/forms/jury-sci-committee/JurySciCommitteeHistory.vue'),
             }
         ]
     },
@@ -138,23 +159,44 @@ const pages = [
         ]
     },
     {
-        path: '/forms/extension',
-        name: 'Extension',
+        path: '/forms/event-participation',
+        name: 'Participation in Events',
         meta: {
             sidebar: true,
             requiresAuth: true
         },
-        component: () => import('../views/forms/extension/ExtensionRoot.vue'),
+        component: () => import('../views/forms/event-participation/EventParticipationRoot.vue'),
         children: [
             {
                 path: '',
                 name: 'Form',
-                component: () => import('../views/forms/extension/ExtensionForm.vue'),
+                component: () => import('../views/forms/event-participation/EventParticipationForm.vue'),
             },
             {
                 path: 'history',
                 name: 'History',
-                component: () => import('../views/forms/extension/ExtensionHistory.vue'),
+                component: () => import('../views/forms/event-participation/EventParticipationHistory.vue'),
+            }
+        ]
+    },
+    {
+        path: '/forms/referring-editorial-act',
+        name: 'Refereeing & Editorial Board',
+        meta: {
+            sidebar: true,
+            requiresAuth: true
+        },
+        component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActRoot.vue'),
+        children: [
+            {
+                path: '',
+                name: 'Form',
+                component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActForm.vue'),
+            },
+            {
+                path: 'history',
+                name: 'History',
+                component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActHistory.vue'),
             }
         ]
     },
@@ -176,48 +218,6 @@ const pages = [
                 path: 'history',
                 name: 'History',
                 component: () => import('../views/forms/supervision/SupervisionHistory.vue'),
-            }
-        ]
-    },
-    {
-        path: '/forms/jury-sci-committee',
-        name: 'Jury / Scientific Committee',
-        meta: {
-            sidebar: true,
-            requiresAuth: true
-        },
-        component: () => import('../views/forms/jury-sci-committee/JurySciCommitteeRoot.vue'),
-        children: [
-            {
-                path: '',
-                name: 'Form',
-                component: () => import('../views/forms/jury-sci-committee/JurySciCommitteeForm.vue'),
-            },
-            {
-                path: 'history',
-                name: 'History',
-                component: () => import('../views/forms/jury-sci-committee/JurySciCommitteeHistory.vue'),
-            }
-        ]
-    },
-    {
-        path: '/forms/referring-editorial-act',
-        name: 'Refereeing Editorial Act',
-        meta: {
-            sidebar: true,
-            requiresAuth: true
-        },
-        component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActRoot.vue'),
-        children: [
-            {
-                path: '',
-                name: 'Form',
-                component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActForm.vue'),
-            },
-            {
-                path: 'history',
-                name: 'History',
-                component: () => import('../views/forms/referring-editorial-act/ReferringEditorialActHistory.vue'),
             }
         ]
     }
