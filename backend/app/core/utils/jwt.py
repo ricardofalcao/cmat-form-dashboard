@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-import jwt
+from jose import jwt
 from pydantic import UUID4
 
 from config import settings
@@ -32,5 +32,7 @@ def decode_token(token: str) -> str:
 
         user_uiid = UUID4(user_id)
         return user_uiid
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as e:
+        print("Error while decoding jwt: " + e.__str__())
+
         return None
