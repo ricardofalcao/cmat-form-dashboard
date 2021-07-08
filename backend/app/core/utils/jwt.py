@@ -24,6 +24,7 @@ def generate_token(user_id: UUID4) -> str:
 
 def decode_token(token: str) -> str:
     try:
+        print(token + " - " + settings.SECRET_KEY + " - " + JWT_ALGORITHM)
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[JWT_ALGORITHM], audience="cmatforms:auth")
 
         user_id = payload.get("user_id")
