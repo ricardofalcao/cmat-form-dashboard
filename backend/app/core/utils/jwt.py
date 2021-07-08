@@ -32,7 +32,7 @@ def decode_token(token: str) -> str:
 
         user_uiid = UUID4(user_id)
         return user_uiid
-    except jwt.PyJWTError as e:
+    except jwt.JWTError as e:
         print("Error while decoding jwt: " + e.__str__())
 
         return None
